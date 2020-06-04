@@ -1,0 +1,25 @@
+-06/03/2020
+[Install Hokuyo Library]
+1. cd ~/src/urg_library-1.2.5/
+2. make 
+3. sudo make install
+4. Lidar ip address "10.19.3.10", port:10940
+5. Changing ip address of Main PC to "10.19.3.1" to be able to connect Hokuyo Sensor 
+6. scan interval 25000 [usec] (40Hz)
+7.  urg_cpp-config --libs 
+-lurg_cpp -lrt -L/usr/local/lib
+8.  urg_cpp-config --cflags
+-I/usr/local/include/urg_cpp
+
+
+
+
+[Pan Motion Controller]
+1. To prevent a permission error of /dev/ttyUSB0 when using RS232, added current user to dialout group as folling command:
+   $usermod -a -G dialout dasl-vision
+2. renew CMotor to DaslPanController 
+~/src/DaslPanMotionController/
+
+
+-06/03/2020
+
