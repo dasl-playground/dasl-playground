@@ -1,4 +1,4 @@
-//Copyright (c) 2020 Dongbin Kim, Dr. GiHo Jang
+//Copyright (c) 2020 Dongbin Kim, Dr. Giho Jang
 //
 // Permission is hereby granted, free of charge,
 // to any person obtaining a copy of this software and associated
@@ -19,9 +19,10 @@
 //  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//Author : Dongbin Kim, GiHo Jang
+//Author : Dongbin Kim, Giho Jang
 //Date : 2020-06-04
-//Title : ROS2 Vision motor position subscriber.
+//Title : ROS2 Vision motor position publisher
+
 
 #include <memory>
 #include "rclcpp/rclcpp.hpp"

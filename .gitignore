@@ -12,3 +12,5 @@ _deps
 *.kdev4
 src/.vscode/
 src/examples-dashing
+.vscode/
+log/
