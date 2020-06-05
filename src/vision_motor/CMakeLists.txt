@@ -19,17 +19,20 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+
+
 
 message("${vision_motor_SOURCE_DIR}")
 message("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(
- # /home/dasl-vision/src/DaslPanMotionController/src 
   ${CMAKE_CURRENT_SOURCE_DIR}/../dasl_playground
- # /opt/ros/dashing/include/
+  /opt/ros/dashing/include/
+  /usr/local/include/urg_cpp
 )
 
 add_executable(visionmotorposinput src/publisher.cpp)
-ament_target_dependencies(visionmotorposinput rclcpp std_msgs geometry_msgs)
+ament_target_dependencies(visionmotorposinput rclcpp std_msgs geometry_msgs sensor_msgs)
 # target_include_directories(visionmotorposinput
 #   PUBLIC
 #     $<BUILD_INTERFACE:/opt/ros/dashing/include/>
@@ -44,6 +47,10 @@ ament_target_dependencies(VisionMotor rclcpp st_msgs geometry_msgs)
 #     $<INSTALL_INTERFACE:include>)
 
 add_executable(DaslPanMotionController src/main.cpp  )
+
+
+# #Library for LiDar3D
+target_link_libraries(visionmotorposinput urg_cpp)
 
 install(TARGETS
   visionmotorposinput

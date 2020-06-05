@@ -146,6 +146,7 @@ inline int DaslPanMotionController::connect()
     for (int i = 0; i < 10; i++)
     {
         sprintf(buff, "/dev/ttyUSB%d", i);
+        printf("%s\n",buff);
         if (m_comm.open(buff) != true)
         {
             continue;
@@ -164,7 +165,7 @@ inline int DaslPanMotionController::connect()
                 m_comm.close();
                 continue;
             }
-            if ((ret = waitReturnValue(data)) != 1)
+            if ((ret = waitReturnValue(data)) != 1) //TODO: Should be add timeout!!
             {
                 m_comm.close();
                 continue;

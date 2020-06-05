@@ -38,7 +38,7 @@
 #include <sys/select.h>
 #include <termios.h>
 
-using std::placeholders::_1;
+
 
 struct termios orig_termios;
 auto &&ctrlPan = DaslPanMotionController::getInstance();
@@ -91,6 +91,7 @@ public:
   VisionMotorPosSub()
       : Node("VisionMotorPoseSub")
   {
+    using std::placeholders::_1;
     subscription = this->create_subscription<geometry_msgs::msg::Point>(
         "motorpose", 100, std::bind(&VisionMotorPosSub::topic_callback, this, _1));
   }

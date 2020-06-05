@@ -23,6 +23,7 @@
 #define _DASLPG_H_
 
 #include "DaslPanMotionController.h"
+#include "DaslLidarNode.h"
 
 
 #endif

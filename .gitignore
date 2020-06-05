@@ -14,3 +14,5 @@ src/.vscode/
 src/examples-dashing
 .vscode/
 log/
+build/
+install/

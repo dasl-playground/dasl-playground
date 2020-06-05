@@ -25,52 +25,26 @@
 
 #include <chrono>
 #include <memory>
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
-#include <geometry_msgs/msg/point.hpp>
 #include <thread>
-
-
+#include <daslpg/daslpg>
 
 double motorpose;
 
-void motorposeinput()
-{
-  while (rclcpp::ok())
-  {
-    printf("type position of motor \n");
-    scanf("%lf", &motorpose);
-  }
-}
-class VisionMotorPosPub : public rclcpp::Node
-{
-public:
-  VisionMotorPosPub()
-      : Node("VisionMotorPosePublisher")
-  {
-    using namespace std::chrono_literals;
-    publisher = this->create_publisher<geometry_msgs::msg::Point>("motorpose", 100);
-    timer_ = this->create_wall_timer(
-        50ms, std::bind(&VisionMotorPosPub::timer_callback, this));
-  }
+// void motorposeinput()
+// {
+//   while (rclcpp::ok())
+//   {
+//     printf("type position of motor \n");
+//     scanf("%lf", &motorpose);
+//   }
+// }
 
-private:
-  void timer_callback()
-  {
-
-    auto message = geometry_msgs::msg::Point();
-    message.x = motorpose;
-    publisher->publish(message);
-  }
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr publisher;
-};
 
 int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
-  std::thread t1(motorposeinput);
-  rclcpp::spin(std::make_shared<VisionMotorPosPub>());
+  //std::thread t1(motorposeinput);
+  rclcpp::spin(std::make_shared<DaslLidarNode>());
   rclcpp::shutdown();
   return 0;
 }
