@@ -59,10 +59,10 @@ public:
       exit(0);
     }
     RCLCPP_INFO(get_logger(), "Successed to open devices");
-    mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
-    mTimer = create_wall_timer(
-        25ms, std::bind(&DaslLidarActionServerNode::pub_topic, this));
-    addSubscription();
+    // mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
+    // mTimer = create_wall_timer(
+    //     25ms, std::bind(&DaslLidarActionServerNode::pub_topic, this));
+    // addSubscription();
   
   }
 
@@ -117,14 +117,14 @@ private:
 
   void addSubscription()
   {
-     mSubscription = create_subscription<std_msgs::msg::String>( 
-       "motorpose2", //name of topic
-       1, //number of topic histories
-     [&](const std_msgs::msg::String::SharedPtr msg){
+    //  mSubscription = create_subscription<std_msgs::msg::String>( 
+    //    "motorpose2", //name of topic
+    //    1, //number of topic histories
+    //  [&](const std_msgs::msg::String::SharedPtr msg){
 
       
-        RCLCPP_INFO(this->get_logger(), "I heard mode: '%s'", msg->data.c_str());
-     });
+    //     RCLCPP_INFO(this->get_logger(), "I heard mode: '%s'", msg->data.c_str());
+    //  });
   }
 
 };
