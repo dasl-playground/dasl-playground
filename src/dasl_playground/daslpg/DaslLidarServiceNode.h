@@ -19,8 +19,8 @@
 //  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef DASL_LIDARNODE_H
-#define DASL_LIDARNODE_H
+#ifndef DASL_LIDAR_ACTION_NODE_H
+#define DASL_LIDAR_ACTION_NODE_H
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -31,12 +31,14 @@
 #include <chrono>
 #include <Urg_driver.h>
 #include "DaslPanMotionController.h"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "example_interfaces/action/fibonacci.hpp"
 
 class DaslLidarActionNode : public rclcpp::Node
 {
-  rclcpp::TimerBase::SharedPtr mTimer;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr mPublisher;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr mSubscription;
+  
+  rclcpp_action::Server<Fibonacci>::SharedPtr action_server;
+  
 
   qrk::Urg_driver mLidar;
   DaslPanMotionController *mMotion;
@@ -45,8 +47,9 @@ class DaslLidarActionNode : public rclcpp::Node
   long mLidarTimeStamp;
 
 public:
-  DaslLidarActionNode() : mMotion(DaslPanMotionController::getInstance()),
-                    Node("VisionMotorPosePublisher")
+  DaslLidarActionNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()) : 
+    mMotion(DaslPanMotionController::getInstance()),
+    Node("VisionMotorPosePublisher", options)
   {
     mLidarTimeStamp = 0;
     using namespace std::chrono_literals;

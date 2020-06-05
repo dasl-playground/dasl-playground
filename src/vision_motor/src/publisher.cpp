@@ -35,7 +35,7 @@ double motorpose;
 //   while (rclcpp::ok())
 //   {
 //     printf("type position of motor \n");
-//     scanf("%lf", &motorpose);
+//     scanf("%s", &motorpose);
 //   }
 // }
 
@@ -43,8 +43,8 @@ double motorpose;
 int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
-  //std::thread t1(motorposeinput);
-  rclcpp::spin(std::make_shared<DaslLidarNode>());
+  // std::thread t1(motorposeinput);
+  rclcpp::spin(std::make_shared<DaslLidarActionNode>());
   rclcpp::shutdown();
   return 0;
 }

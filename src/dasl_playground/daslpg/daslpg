@@ -24,6 +24,6 @@
 
 #include "DaslPanMotionController.h"
 #include "DaslLidarNode.h"
-
+#include "DaslLidarActionNode.h"
 
 #endif
