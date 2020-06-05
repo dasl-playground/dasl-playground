@@ -18,7 +18,6 @@
 //  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
 //  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 #ifndef DASL_LIDAR_ACTION_NODE_H
 #define DASL_LIDAR_ACTION_NODE_H
 
@@ -32,12 +31,12 @@
 #include <Urg_driver.h>
 #include "DaslPanMotionController.h"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "example_interfaces/action/fibonacci.hpp"
+#include "dasl_playground/action/dasl_lidar_action.hpp"
 
-class DaslLidarActionNode : public rclcpp::Node
+class DaslLidarActionServerNode : public rclcpp::Node
 {
   
-  rclcpp_action::Server<Fibonacci>::SharedPtr action_server;
+  rclcpp_action::Server<DaslLidarAction>::SharedPtr action_server;
   
 
   qrk::Urg_driver mLidar;
@@ -47,7 +46,7 @@ class DaslLidarActionNode : public rclcpp::Node
   long mLidarTimeStamp;
 
 public:
-  DaslLidarActionNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()) : 
+  DaslLidarActionServerNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()) : 
     mMotion(DaslPanMotionController::getInstance()),
     Node("VisionMotorPosePublisher", options)
   {
@@ -62,12 +61,12 @@ public:
     RCLCPP_INFO(get_logger(), "Successed to open devices");
     mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
     mTimer = create_wall_timer(
-        25ms, std::bind(&DaslLidarActionNode::pub_topic, this));
+        25ms, std::bind(&DaslLidarActionServerNode::pub_topic, this));
     addSubscription();
   
   }
 
-  ~DaslLidarActionNode()
+  ~DaslLidarActionServerNode()
   {
     RCLCPP_INFO(get_logger(), "Release Devices");
     release();

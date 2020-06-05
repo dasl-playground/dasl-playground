@@ -32,7 +32,7 @@
 #include <Urg_driver.h>
 #include "DaslPanMotionController.h"
 
-class DaslLidarActionNode : public rclcpp::Node
+class DaslLidarNode : public rclcpp::Node
 {
   rclcpp::TimerBase::SharedPtr mTimer;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr mPublisher;
@@ -45,7 +45,7 @@ class DaslLidarActionNode : public rclcpp::Node
   long mLidarTimeStamp;
 
 public:
-  DaslLidarActionNode() : mMotion(DaslPanMotionController::getInstance()),
+  DaslLidarNode() : mMotion(DaslPanMotionController::getInstance()),
                     Node("VisionMotorPosePublisher")
   {
     mLidarTimeStamp = 0;
@@ -59,12 +59,12 @@ public:
     RCLCPP_INFO(get_logger(), "Successed to open devices");
     mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
     mTimer = create_wall_timer(
-        25ms, std::bind(&DaslLidarActionNode::pub_topic, this));
-    addSubscription();
+        25ms, std::bind(&DaslLidarNode::pub_topic, this));
+    addSubscription(); 
   
   }
 
-  ~DaslLidarActionNode()
+  ~DaslLidarNode()
   {
     RCLCPP_INFO(get_logger(), "Release Devices");
     release();

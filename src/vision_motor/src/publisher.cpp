@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
   // std::thread t1(motorposeinput);
-  rclcpp::spin(std::make_shared<DaslLidarActionNode>());
+  rclcpp::spin(std::make_shared<DaslLidarNode>());
   rclcpp::shutdown();
   return 0;
 }

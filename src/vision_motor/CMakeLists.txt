@@ -21,6 +21,19 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+find_package(rclcpp_action REQUIRED)
+find_package(dasl_playground REQUIRED)
+
+
+# get_filename_component(DASL_PLAYGROUND_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../dasl_playground" ABSOLUTE)
+# message("DASL_PLAYGROUND_DIR = ${DASL_PLAYGROUND_DIR}")
+# message("PROJECT_NAME = ${PROJECT_NAME}")
+
+# Action
+# find_package(rosidl_default_generators REQUIRED) 
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   "../dasl_playground/action/DaslLidarAction.action"
+# )
 
 
 message("${vision_motor_SOURCE_DIR}")
@@ -32,7 +45,7 @@ include_directories(
 )
 
 add_executable(visionmotorposinput src/publisher.cpp)
-ament_target_dependencies(visionmotorposinput rclcpp std_msgs geometry_msgs sensor_msgs)
+ament_target_dependencies(visionmotorposinput rclcpp std_msgs geometry_msgs sensor_msgs rclcpp_action dasl_playground )
 # target_include_directories(visionmotorposinput
 #   PUBLIC
 #     $<BUILD_INTERFACE:/opt/ros/dashing/include/>
