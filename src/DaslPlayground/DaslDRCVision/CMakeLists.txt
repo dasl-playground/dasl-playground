@@ -39,10 +39,10 @@ find_package(sensor_msgs REQUIRED)
 message("${vision_motor_SOURCE_DIR}")
 message("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../DaslLibrary/include/DaslLibrary
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../DaslLibrary/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   /opt/ros/dashing/include/
-  /usr/local/include/urg_cpp
+  /usr/local/include/
 )
 
 add_executable(DaslDRCVisionNode src/DaslDRCVisionNode.cpp)
@@ -65,12 +65,10 @@ ament_target_dependencies(DaslDRCVisionNode rclcpp std_msgs geometry_msgs sensor
 
 
 # #Library for LiDar3D
-target_link_libraries(visionmotorposinput urg_cpp)
+target_link_libraries(DaslDRCVisionNode urg_cpp)
 
 install(TARGETS
-  visionmotorposinput
-  VisionMotor
-  DaslPanMotionController
+  DaslDRCVisionNode
   DESTINATION lib/${PROJECT_NAME}
 )
 

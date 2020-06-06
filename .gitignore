@@ -16,3 +16,6 @@ src/examples-dashing
 log/
 build/
 install/
+*.user
+*.autosave
+*.autosave

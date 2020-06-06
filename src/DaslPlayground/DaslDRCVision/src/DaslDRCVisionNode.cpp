@@ -26,7 +26,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
-#include <DaslLidarNode.h>
+#include <DaslDRCVisionNode.h>
 
 double motorpose;
 

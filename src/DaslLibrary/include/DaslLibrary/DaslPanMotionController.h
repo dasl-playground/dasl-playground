@@ -22,6 +22,7 @@
 #ifndef DASL_PANMOTION_CONTROLLER_H
 #define DASL_PANMOTION_CONTROLLER_H
 
+
 #include "DaslRS232.h"
 #include <vector>
 #include <memory.h>
