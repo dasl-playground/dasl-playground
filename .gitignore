@@ -19,3 +19,5 @@ install/
 *.user
 *.autosave
 *.autosave
+.idea
+cmake-build-debug
