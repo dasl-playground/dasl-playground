@@ -1,4 +1,4 @@
-//Copyright (c) 2020 Dongbin Kim, Dr. Giho Jang
+//Copyright (c) 2020 Dongbin Kim, Giho Jang
 //
 // Permission is hereby granted, free of charge,
 // to any person obtaining a copy of this software and associated
@@ -19,32 +19,10 @@
 //  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//Author : Dongbin Kim, Giho Jang
-//Date : 2020-06-04
-//Title : ROS2 Vision motor position publisher
+#ifndef _DASLPG_H_
+#define _DASLPG_H_
 
-#include <chrono>
-#include <memory>
-#include <thread>
-#include <daslpg/daslpg>
+#include "DaslPanMotionController.h"
+#include "DaslRS232.h"
 
-double motorpose;
-
-// void motorposeinput()
-// {
-//   while (rclcpp::ok())
-//   {
-//     printf("type position of motor \n");
-//     scanf("%s", &motorpose);
-//   }
-// }
-
-
-int main(int argc, char *argv[])
-{
-  rclcpp::init(argc, argv);
-  // std::thread t1(motorposeinput);
-  rclcpp::spin(std::make_shared<DaslLidarNode>());
-  rclcpp::shutdown();
-  return 0;
-}
+#endif

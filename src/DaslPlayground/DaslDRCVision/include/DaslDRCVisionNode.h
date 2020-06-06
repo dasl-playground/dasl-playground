@@ -22,15 +22,18 @@
 #ifndef DASL_LIDARNODE_H
 #define DASL_LIDARNODE_H
 
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <daslpg/daslpg>
+#include <DaslLibrary/DaslLibrary>
 #include <chrono>
-#include <Urg_driver.h>
-#include "DaslPanMotionController.h"
+//#include <Urg_driver.h>
+
+
+
 
 class DaslLidarNode : public rclcpp::Node
 {
@@ -50,6 +53,7 @@ public:
   {
     mLidarTimeStamp = 0;
     using namespace std::chrono_literals;
+
     using std::placeholders::_1;
     if (!init())
     {
@@ -58,8 +62,7 @@ public:
     }
     RCLCPP_INFO(get_logger(), "Successed to open devices");
     mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
-    mTimer = create_wall_timer(
-        25ms, std::bind(&DaslLidarNode::pub_topic, this));
+    mTimer = create_wall_timer(25ms, std::bind(&DaslLidarNode::pub_topic, this));
     addSubscription(); 
   
   }

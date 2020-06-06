@@ -18,26 +18,26 @@
 //  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
 //  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#ifndef DASL_LIDAR_ACTION_NODE_H
-#define DASL_LIDAR_ACTION_NODE_H
 
-#include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#ifndef DASL_LIDARNODE_H
+#define DASL_LIDARNODE_H
+
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <daslpg/daslpg>
+#include <DaslLibrary/DaslLibrary>
 #include <chrono>
-#include <Urg_driver.h>
-#include "DaslPanMotionController.h"
-#include "rclcpp_action/rclcpp_action.hpp"
-#include "dasl_playground/action/dasl_lidar_action.hpp"
+//#include <Urg_driver.h>
 
-class DaslLidarActionServerNode : public rclcpp::Node
+
+class DaslLidarNode : public rclcpp::Node
 {
-  
-  rclcpp_action::Server<DaslLidarAction>::SharedPtr action_server;
-  
+  rclcpp::TimerBase::SharedPtr mTimer;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr mPublisher;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr mSubscription;
 
   qrk::Urg_driver mLidar;
   DaslPanMotionController *mMotion;
@@ -46,12 +46,12 @@ class DaslLidarActionServerNode : public rclcpp::Node
   long mLidarTimeStamp;
 
 public:
-  DaslLidarActionServerNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()) : 
-    mMotion(DaslPanMotionController::getInstance()),
-    Node("VisionMotorPosePublisher", options)
+  DaslLidarNode() : mMotion(DaslPanMotionController::getInstance()),
+                    Node("VisionMotorPosePublisher")
   {
     mLidarTimeStamp = 0;
     using namespace std::chrono_literals;
+
     using std::placeholders::_1;
     if (!init())
     {
@@ -59,14 +59,13 @@ public:
       exit(0);
     }
     RCLCPP_INFO(get_logger(), "Successed to open devices");
-    // mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
-    // mTimer = create_wall_timer(
-    //     25ms, std::bind(&DaslLidarActionServerNode::pub_topic, this));
-    // addSubscription();
+    mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
+    mTimer = create_wall_timer(25ms, std::bind(&DaslLidarNode::pub_topic, this));
+    addSubscription(); 
   
   }
 
-  ~DaslLidarActionServerNode()
+  ~DaslLidarNode()
   {
     RCLCPP_INFO(get_logger(), "Release Devices");
     release();
@@ -117,14 +116,14 @@ private:
 
   void addSubscription()
   {
-    //  mSubscription = create_subscription<std_msgs::msg::String>( 
-    //    "motorpose2", //name of topic
-    //    1, //number of topic histories
-    //  [&](const std_msgs::msg::String::SharedPtr msg){
+     mSubscription = create_subscription<std_msgs::msg::String>( 
+       "motorpose2", //name of topic
+       1, //number of topic histories
+     [&](const std_msgs::msg::String::SharedPtr msg){
 
       
-    //     RCLCPP_INFO(this->get_logger(), "I heard mode: '%s'", msg->data.c_str());
-    //  });
+        RCLCPP_INFO(this->get_logger(), "I heard mode: '%s'", msg->data.c_str());
+     });
   }
 
 };
