@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(dasl_playground)
+project(dasl_action)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)

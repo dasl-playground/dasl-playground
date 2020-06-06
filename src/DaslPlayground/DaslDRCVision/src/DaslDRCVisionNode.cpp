@@ -26,7 +26,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
-#include <DaslDRCVisionNode.h>
+#include <DaslDRCVision/DaslDRCVisionNode.h>
 
 double motorpose;
 
