@@ -60,7 +60,7 @@ public:
       RCLCPP_ERROR(get_logger(), "Device Error");
       exit(0);
     }
-    RCLCPP_INFO(get_logger(), "Successed to open devices");
+    RCLCPP_INFO(get_logger(), "Success to open devices");
     mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
     mTimer = create_wall_timer(25ms, std::bind(&DaslLidarNode::pub_topic, this));
     addSubscription(); 
