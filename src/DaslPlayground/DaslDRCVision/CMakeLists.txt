@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(dasl_drc_vision)
-
+list(APPEND CMAKE_PREFIX_PATH $ENV{AMENT_PREFIX_PATH})
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -21,6 +21,9 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+
+
+
 #find_package(rclcpp_action REQUIRED)
 #find_package(dasl_playground REQUIRED)
 
@@ -39,10 +42,11 @@ find_package(sensor_msgs REQUIRED)
 message("${vision_motor_SOURCE_DIR}")
 message("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../DaslLibrary/include/
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  /opt/ros/dashing/include/
-  /usr/local/include/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        /opt/ros/foxy/include/
+        /usr/local/include/
+
 )
 
 add_executable(DaslDRCVisionNode src/DaslDRCVisionNode.cpp)

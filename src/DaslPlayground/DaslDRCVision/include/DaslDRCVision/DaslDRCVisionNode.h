@@ -28,7 +28,7 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <DaslLibrary/DaslLibrary>
+#include <Dasl/Dasl>
 #include <urg_cpp/Urg_driver.h>
 #include <chrono>
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-
+list(APPEND CMAKE_PREFIX_PATH $ENV{AMENT_PREFIX_PATH})
 project(dasl_service)
 
 # Default to C++14
@@ -13,7 +13,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-
+include_directories(../include)
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
