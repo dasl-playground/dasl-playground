@@ -41,7 +41,7 @@ ament_target_dependencies(drc_vision_action_server
 target_link_libraries(drc_vision_action_server urg_cpp)
 
 install(TARGETS drc_vision_action_server
-  DESTINATION lib/${DASL_PLAYGROUND}
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

@@ -14,6 +14,33 @@
 
 #ifndef DEV_WS_DRCVISIONACTIONSERVER_H
 #define DEV_WS_DRCVISIONACTIONSERVER_H
+#include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <dasl_action/action/dasl_lidar_action.hpp>
+
+
+class DRCVisionActionServer :public rclcpp::Node{
+
+public:
+    using DRCLidarAction = dasl_action::action::DaslLidarAction;
+    using GoalHandleLidarAction = rclcpp_action::ServerGoalHandle<DRCLidarAction>;
+    rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
+
+    explicit DRCVisionActionServer(
+            const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+
+    rclcpp_action::GoalResponse handle_goal(
+            const rclcpp_action::GoalUUID &uuid,
+            std::shared_ptr<const DRCLidarAction::Goal> goal);
+
+    rclcpp_action::CancelResponse handle_cancel(
+            std::shared_ptr<GoalHandleLidarAction> goal_handle);
+
+    void handle_accepted(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
+
+    void execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
+};
 
 
 #endif //DEV_WS_DRCVISIONACTIONSERVER_H

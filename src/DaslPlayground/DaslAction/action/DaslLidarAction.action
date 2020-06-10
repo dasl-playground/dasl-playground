@@ -1,4 +1,5 @@
 string command
+float32[] parameters
 ---
 string result
 ---
