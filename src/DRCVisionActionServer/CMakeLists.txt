@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
-project(dasl_action)
 
+project(drc_vision_action_server)
+
+set(DASL_PLAYGROUND dasl_playground)
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -17,13 +19,31 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-rosidl_generate_interfaces(${PROJECT_NAME}
-        "action/DaslLidarAction.action"
-        )
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(dasl_interface REQUIRED)
+
+
+
+
+add_executable(drc_vision_action_server DRCVisionActionServer.cpp)
+ament_target_dependencies(drc_vision_action_server
+        "rclcpp"
+        "rclcpp_action"
+        "std_msgs"
+        "geometry_msgs"
+        "sensor_msgs"
+        "dasl_interface"
+)
+
+# #Library for LiDar3D
+target_link_libraries(drc_vision_action_server urg_cpp)
+
+install(TARGETS drc_vision_action_server
+  DESTINATION ../${DASL_PLAYGROUND}/lib/${DASL_PLAYGROUND}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

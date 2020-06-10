@@ -5,7 +5,7 @@
 #include "DRCVisionActionServer.h"
 #include <thread>
 #include <functional>
-#include <inttypes.h>
+
 
 
 DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options) :
@@ -27,8 +27,9 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
 
 }
 
-rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(const rclcpp_action::GoalUUID &uuid,
-                                                               std::shared_ptr<const DRCLidarAction::Goal> goal) {
+rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
+        const rclcpp_action::GoalUUID &uuid,
+        std::shared_ptr<const DRCLidarAction::Goal> goal) {
     RCLCPP_INFO(this->get_logger(), "Received goal request with command %s", goal->command.c_str());
 
 
@@ -36,28 +37,31 @@ rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(const rclcpp_acti
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
-rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(std::shared_ptr<GoalHandleLidarAction> goal_handle) {
+rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
+        std::shared_ptr<GoalHandleLidarAction> goal_handle ) {
 
     RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
 
     return rclcpp_action::CancelResponse::ACCEPT;
 }
-void DRCVisionActionServer::execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle){
+void DRCVisionActionServer::execute(
+        const std::shared_ptr<GoalHandleLidarAction>& goal_handle ){
     RCLCPP_INFO(this->get_logger(), "Executing goal");
     //TODO:work...
 
-    const auto command = goal_handle->get_goal();
+    auto && command = goal_handle->get_goal()->command;
     auto && feedback = std::make_shared<DRCLidarAction::Feedback>();
     auto && status = feedback->status;
-
-
+    auto && param =  goal_handle->get_goal()->parameters;
 
 
     RCLCPP_INFO(this->get_logger(), "Goal Succeeded");
 
 }
 
-void DRCVisionActionServer::handle_accepted(const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
+void DRCVisionActionServer::handle_accepted(
+        const std::shared_ptr<GoalHandleLidarAction>& goal_handle
+        ) {
 
     using namespace std::placeholders;
     std::thread(
@@ -75,6 +79,4 @@ int main(int argc, char ** argv){
     rclcpp::spin(std::make_shared<DRCVisionActionServer>());
 
     rclcpp::shutdown();
-
-
 }

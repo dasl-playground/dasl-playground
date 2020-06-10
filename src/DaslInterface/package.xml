@@ -7,11 +7,13 @@
 
 
 
-<name>dasl_action</name>
+<name>dasl_interface</name>
 <version>0.0.0</version>
-<description>TODO: Package description</description>
-<maintainer email="smile.giho@gmail.com">Giho Jang</maintainer>
-<license>MIT</license>
+<description>ros2 action, message and service interfaces</description>
+<maintainer email="akdba0207@gmail.com">Dongbin Kim</maintainer>
+<license>Apache License 2.0</license>
+<author email="smile.giho@gmail.com">Giho Jang</author>
+<author email="akdba0207@gmail.com">Dongbin Kim</author>
 
 <buildtool_depend>ament_cmake</buildtool_depend>
 

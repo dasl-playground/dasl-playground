@@ -17,13 +17,13 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
-#include <dasl_action/action/dasl_lidar_action.hpp>
+#include <dasl_interface/action/drc_lidar.hpp>
 
 
 class DRCVisionActionServer :public rclcpp::Node{
 
 public:
-    using DRCLidarAction = dasl_action::action::DaslLidarAction;
+    using DRCLidarAction = dasl_interface::action::DRCLidar;
     using GoalHandleLidarAction = rclcpp_action::ServerGoalHandle<DRCLidarAction>;
     rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
 
@@ -37,9 +37,9 @@ public:
     rclcpp_action::CancelResponse handle_cancel(
             std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
-    void handle_accepted(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
+    void handle_accepted(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
 
-    void execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
+    void execute(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
 };
 
 
