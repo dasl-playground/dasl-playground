@@ -26,7 +26,9 @@ find_package(sensor_msgs REQUIRED)
 find_package(dasl_interface REQUIRED)
 
 
-
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
+)
 
 add_executable(drc_vision_action_server DRCVisionActionServer.cpp)
 ament_target_dependencies(drc_vision_action_server

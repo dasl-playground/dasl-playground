@@ -18,28 +18,39 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <dasl_interface/action/drc_lidar.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <Dasl/Dasl>
 
 
 class DRCVisionActionServer :public rclcpp::Node{
 
+     Dasl::DRCLidar *mLidar = Dasl::DRCLidar::getInstance();
+
 public:
+
     using DRCLidarAction = dasl_interface::action::DRCLidar;
     using GoalHandleLidarAction = rclcpp_action::ServerGoalHandle<DRCLidarAction>;
+
+    using PointCloud2 = sensor_msgs::msg::PointCloud2;
     rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
+    rclcpp::Publisher<PointCloud2>::SharedPtr mPublisher;
+
 
     explicit DRCVisionActionServer(
             const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
 
     rclcpp_action::GoalResponse handle_goal(
             const rclcpp_action::GoalUUID &uuid,
-            std::shared_ptr<const DRCLidarAction::Goal> goal);
+            const std::shared_ptr<const DRCLidarAction::Goal>& goal);
 
     rclcpp_action::CancelResponse handle_cancel(
-            std::shared_ptr<GoalHandleLidarAction> goal_handle);
+            const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
 
     void handle_accepted(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
 
     void execute(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
+
+
 };
 
 

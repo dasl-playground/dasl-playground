@@ -22,7 +22,6 @@
 #ifndef _DASLPG_H_
 #define _DASLPG_H_
 
-#include "DaslPanMotionController.h"
-#include "DaslRS232.h"
+#include "Dasl/DRCLidar/DRCLidar.h"
 
 #endif
