@@ -50,7 +50,7 @@ rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
 void DRCVisionActionServer::execute(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
 
-    mExecMutex.lock();
+
 
     auto &&command = goal_handle->get_goal()->command;
     auto &&feedback = std::make_shared<DRCLidarAction::Feedback>();
@@ -96,17 +96,18 @@ void DRCVisionActionServer::execute(
     RCLCPP_INFO(this->get_logger(),
                 "End DRCVisionActionServer::execute(%s)",
                 command.c_str());
-    mExecMutex.unlock();
+
 }
 
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
-
+    mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
     std::thread([&]() {
         execute(goal_handle);
     }).detach();
+    mExecMutex.unlock();
 }
 
 DRCVisionActionServer::~DRCVisionActionServer() {

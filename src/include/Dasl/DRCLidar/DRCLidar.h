@@ -35,20 +35,22 @@ class DRCLidar {
 
         bool open(std::string ip_address = "10.19.3.10"){
 
-            //RCLCPP_INFO(get_logger(), "mLidar.is_open()");
-            if (mLidar.is_open()){
+            if (mLidar.is_open() && mMotion->isOpen()){
                 return true;
             }
-            //RCLCPP_INFO(get_logger(), "mMotion->connect()");
+
             if(!mMotion->isOpen()){
+                mMotion->disconnect();
                 mMotion->connect();
             }
-            //RCLCPP_INFO(get_logger(), "mLidar.open()");
-            if (!mLidar.open(ip_address.c_str(), qrk::Urg_driver::Default_port, qrk::Urg_driver::Ethernet)){
-                return false;
+            if(!mLidar.is_open()) {
+                mLidar.close();
+                if (!mLidar.open(ip_address.c_str(), qrk::Urg_driver::Default_port, qrk::Urg_driver::Ethernet)) {
+                    return false;
+                }
+                mLidar.stop_measurement();
+                mLidar.start_measurement();
             }
-            mLidar.stop_measurement();
-            mLidar.start_measurement();
             return true;
         }
         bool reset(){
