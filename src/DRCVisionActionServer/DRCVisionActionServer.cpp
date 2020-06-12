@@ -95,11 +95,11 @@ void DRCVisionActionServer::execute(
     }
     goal_handle->publish_feedback(feedback);
 
-    //if (rclcpp::ok()) {
+    if (rclcpp::ok()) {
         result->result = "success";
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Goal Succeeded");
-    //}
+    }
     RCLCPP_INFO(this->get_logger(),
                 "End DRCVisionActionServer::execute(%s)",
                 command.c_str());
@@ -108,13 +108,16 @@ void DRCVisionActionServer::execute(
 
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
-   // mExecMutex.lock();
+   mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
-    std::thread([&]() {
-        execute(goal_handle);
-    }).detach();
-    //mExecMutex.unlock();
+
+    using namespace  std::placeholders;
+    std::thread([&](auto && par1) {
+        execute(par1);
+    }, goal_handle).detach();
+
+    mExecMutex.unlock();
 }
 
 DRCVisionActionServer::~DRCVisionActionServer() {
