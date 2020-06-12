@@ -380,7 +380,7 @@ inline int DaslPanMotionController::scan(int scan_start, int scan_end, float sca
     }
     data[15] = ((int)(goto_time * 10)) & 0xFF;
 
-    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
+    if ((ret = execCommand(data)) != 1)
     {
         return ret;
     }
