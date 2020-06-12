@@ -46,14 +46,14 @@ public:
 
     rclcpp_action::GoalResponse handle_goal(
             const rclcpp_action::GoalUUID &uuid,
-            const std::shared_ptr<const DRCLidarAction::Goal>& goal);
+            const std::shared_ptr<const DRCLidarAction::Goal> goal);
 
     rclcpp_action::CancelResponse handle_cancel(
-            const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
+            const std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
-    void handle_accepted(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
+    void handle_accepted(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
-    void execute(const std::shared_ptr<GoalHandleLidarAction>& goal_handle);
+    void execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
 
 };

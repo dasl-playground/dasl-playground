@@ -29,7 +29,7 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
 
 rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
         const rclcpp_action::GoalUUID &uuid,
-        const std::shared_ptr<const DRCLidarAction::Goal>& goal) {
+        const std::shared_ptr<const DRCLidarAction::Goal> goal) {
 
     RCLCPP_INFO(
             get_logger(),
@@ -40,7 +40,7 @@ rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
 }
 
 rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
-        const std::shared_ptr<GoalHandleLidarAction>& goal_handle) {
+        const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
 
     RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
 
@@ -48,7 +48,7 @@ rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
 }
 
 void DRCVisionActionServer::execute(
-        const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
+        const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
 
     auto result = std::make_shared<DRCLidarAction ::Result>();
 
@@ -107,15 +107,15 @@ void DRCVisionActionServer::execute(
 }
 
 void DRCVisionActionServer::handle_accepted(
-        const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
+        const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
    mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
 
     using namespace  std::placeholders;
-    std::thread([&](auto && par1) {
-        execute(par1);
-    }, goal_handle).detach();
+    std::thread([&,goal_handle]() {
+        execute(goal_handle);
+    }).detach();
 
     mExecMutex.unlock();
 }
