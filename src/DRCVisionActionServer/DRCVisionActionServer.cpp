@@ -36,7 +36,6 @@ rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
             "Received goal request with command %s",
             goal->command.c_str());
 
-
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
@@ -59,7 +58,7 @@ void DRCVisionActionServer::execute(
     auto &&param = goal_handle->get_goal()->parameters;
 
     RCLCPP_INFO(this->get_logger(),
-                "DRCVisionActionServer::execute(%s)",
+                "Begin DRCVisionActionServer::execute(%s)",
                 command.c_str());
 
     if(command == "open"){
@@ -82,8 +81,8 @@ void DRCVisionActionServer::execute(
         mLidar->scan(-50,
                      50,
                      3,
-                     1,
-                     0);
+                     1);
+                     //0);
 
 
        // while(1){
@@ -94,13 +93,16 @@ void DRCVisionActionServer::execute(
         RCLCPP_DEBUG(this->get_logger(),
                      "end scan");
     }
-
+    RCLCPP_INFO(this->get_logger(),
+                "End DRCVisionActionServer::execute(%s)",
+                command.c_str());
 }
 
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
 
-
+    RCLCPP_DEBUG(get_logger(),
+                 "handle accepted");
     std::thread([&]() {
         execute(goal_handle);
     }).detach();
