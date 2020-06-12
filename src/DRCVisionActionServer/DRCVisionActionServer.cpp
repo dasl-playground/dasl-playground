@@ -36,7 +36,7 @@ rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
             "Received goal request with command %s",
             goal->command.c_str());
 
-    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+    return rclcpp_action::GoalResponse::ACCEPT_AND_DEFER;
 }
 
 rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
