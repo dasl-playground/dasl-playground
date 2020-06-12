@@ -95,11 +95,11 @@ void DRCVisionActionServer::execute(
     }
     goal_handle->publish_feedback(feedback);
 
-    if (rclcpp::ok()) {
+    //if (rclcpp::ok()) {
         result->result = "success";
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Goal Succeeded");
-    }
+    //}
     RCLCPP_INFO(this->get_logger(),
                 "End DRCVisionActionServer::execute(%s)",
                 command.c_str());
