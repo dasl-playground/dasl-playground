@@ -533,6 +533,8 @@ inline int DaslPanMotionController::execCommand(unsigned char *data)
         m_conn_flag = 0;
         return -2;
     }
+    waitReturnValue(data);
+
 
     return 1;
 }
@@ -545,7 +547,7 @@ inline int DaslPanMotionController::execCommandAndWaitUntilResponse(unsigned cha
         m_conn_flag = 0;
         return -2;
     }
-    waitReturnValue(data);
+
 
     return 1;
 }
@@ -563,6 +565,9 @@ inline int DaslPanMotionController::waitReturnValue(unsigned char *data)
     {
         return ret;
     }
+
+    motor_stat[0].byte = data[6];
+
     return 1;
 }
 

@@ -74,7 +74,7 @@ void DRCVisionActionServer::execute(
         mLidar->reset();
     }
     else if(command == "scan"){
-        RCLCPP_DEBUG(this->get_logger(),
+        RCLCPP_INFO(this->get_logger(),
                     "start scan");
 
         PointCloud2 message;
@@ -90,7 +90,7 @@ void DRCVisionActionServer::execute(
        // }
         //message = PointCloud2();
        // mPublisher->publish(message);
-        RCLCPP_DEBUG(this->get_logger(),
+        RCLCPP_INFO(this->get_logger(),
                      "end scan");
     }
     RCLCPP_INFO(this->get_logger(),
@@ -102,7 +102,7 @@ void DRCVisionActionServer::execute(
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
 
-    RCLCPP_DEBUG(get_logger(),
+    RCLCPP_INFO(get_logger(),
                  "handle accepted");
     std::thread([&]() {
         execute(goal_handle);
