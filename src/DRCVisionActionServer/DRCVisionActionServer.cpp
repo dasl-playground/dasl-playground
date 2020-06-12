@@ -88,8 +88,8 @@ void DRCVisionActionServer::execute(
        // while(1){
             float posPan = mLidar->getPosition();
        // }
-        message = PointCloud2();
-        mPublisher->publish(message);
+        //message = PointCloud2();
+       // mPublisher->publish(message);
     }
 
 }
