@@ -20,11 +20,13 @@
 #include <dasl_interface/action/drc_lidar.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <Dasl/Dasl>
+#include <mutex>
 
 
 class DRCVisionActionServer :public rclcpp::Node{
 
      Dasl::DRCLidar *mLidar = Dasl::DRCLidar::getInstance();
+    std::mutex mExecMutex;
 
 public:
 

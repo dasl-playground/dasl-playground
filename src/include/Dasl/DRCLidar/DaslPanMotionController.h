@@ -99,6 +99,11 @@ public:
 	int getScanPosition(int start);
 
 
+    bool isOpen();
+
+    int execCommandAndWaitUntilResponse(unsigned char *data);
+
+
 };
 inline  DaslPanMotionController::DaslPanMotionController()
 {
@@ -136,7 +141,10 @@ inline int DaslPanMotionController::getScanPosition(int start)
     }
     return readScanPosition();
 }
+inline bool DaslPanMotionController::isOpen(){
 
+    return m_conn_flag != 0;
+}
 inline int DaslPanMotionController::connect()
 {
     int ret;
@@ -411,10 +419,11 @@ inline int DaslPanMotionController::findHome()
     data[3] = 0x11; // Find home
     data[6] = 0xFF; // for all axes
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
+
     return 0;
 }
 
@@ -524,6 +533,19 @@ inline int DaslPanMotionController::execCommand(unsigned char *data)
         m_conn_flag = 0;
         return -2;
     }
+
+    return 1;
+}
+
+inline int DaslPanMotionController::execCommandAndWaitUntilResponse(unsigned char *data)
+{
+    putCheckSum(data);
+    if (m_comm.write(data, 16) != 16)
+    {
+        m_conn_flag = 0;
+        return -2;
+    }
+    waitReturnValue(data);
 
     return 1;
 }

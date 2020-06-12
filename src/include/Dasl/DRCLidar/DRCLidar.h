@@ -40,8 +40,9 @@ class DRCLidar {
                 return true;
             }
             //RCLCPP_INFO(get_logger(), "mMotion->connect()");
-            mMotion->connect();
-
+            if(!mMotion->isOpen()){
+                mMotion->connect();
+            }
             //RCLCPP_INFO(get_logger(), "mLidar.open()");
             if (!mLidar.open(ip_address.c_str(), qrk::Urg_driver::Default_port, qrk::Urg_driver::Ethernet)){
                 return false;
@@ -51,23 +52,42 @@ class DRCLidar {
             return true;
         }
         bool reset(){
+
             mLidar.reboot();
         }
         bool close(){
+            bool ret = true;
+
+            if(!mMotion->isOpen() || !mLidar.is_open()){
+                ret = false;
+            }
             mLidar.close();
             mMotion->disconnect();
-            return true;
+
+            return ret;
         }
         bool findHome(){
-            mMotion->findHome();
+
+            if(mMotion->isOpen()){
+                mMotion->findHome();
+                return true;
+            }
+            return false;
+
         }
         bool scan(int scan_start_deg=-50, int scan_end_deg=50, float scanning_period=3, float goto_time=1,int finished_pos=0){
             printf("[Trace] Called DRCLidar::scan\n");
-            mMotion->scan(scan_start_deg,scan_end_deg,scanning_period,goto_time,finished_pos,0);
-
+            if(mMotion->isOpen()){
+                mMotion->scan(scan_start_deg,scan_end_deg,scanning_period,goto_time,finished_pos,0);
+                return true;
+            }
+            return false;
         }
         float getPosition(){
-            return mMotion->getPosition();
+            if(mMotion->isOpen()) {
+                return  mMotion->getPosition();
+            }
+            return 0.0;
         }
     };
 }
