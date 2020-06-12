@@ -52,7 +52,6 @@ void DRCVisionActionServer::execute(
 
     auto result = std::make_shared<DRCLidarAction ::Result>();
 
-
     auto &&command = goal_handle->get_goal()->command;
     auto &&feedback = std::make_shared<DRCLidarAction::Feedback>();
     auto &&status = feedback->status;
@@ -94,6 +93,8 @@ void DRCVisionActionServer::execute(
         RCLCPP_INFO(this->get_logger(),
                      "end scan");
     }
+    goal_handle->publish_feedback(feedback);
+
     if (rclcpp::ok()) {
         result->result = "success";
         goal_handle->succeed(result);
