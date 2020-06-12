@@ -108,13 +108,13 @@ void DRCVisionActionServer::execute(
 
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
-    mExecMutex.lock();
+   // mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
     std::thread([&]() {
         execute(goal_handle);
     }).detach();
-    mExecMutex.unlock();
+    //mExecMutex.unlock();
 }
 
 DRCVisionActionServer::~DRCVisionActionServer() {
