@@ -41,6 +41,9 @@ public:
     explicit DRCVisionActionServer(
             const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
 
+    ~DRCVisionActionServer();
+
+
     rclcpp_action::GoalResponse handle_goal(
             const rclcpp_action::GoalUUID &uuid,
             const std::shared_ptr<const DRCLidarAction::Goal>& goal);

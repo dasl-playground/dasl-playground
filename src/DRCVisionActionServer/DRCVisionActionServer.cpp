@@ -109,6 +109,14 @@ void DRCVisionActionServer::handle_accepted(
     }).detach();
 }
 
+DRCVisionActionServer::~DRCVisionActionServer() {
+
+
+    mLidar->close();
+    RCLCPP_INFO(get_logger(),
+                "DRC Lidar Module Closed");
+}
+
 
 int main(int argc, char **argv) {
 
