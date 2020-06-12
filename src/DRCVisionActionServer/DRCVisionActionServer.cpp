@@ -111,8 +111,7 @@ void DRCVisionActionServer::handle_accepted(
    mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
-
-    using namespace  std::placeholders;
+    
     std::thread([&,goal_handle]() {
         execute(goal_handle);
     }).detach();
