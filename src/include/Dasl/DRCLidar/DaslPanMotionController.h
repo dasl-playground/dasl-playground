@@ -316,7 +316,7 @@ inline int DaslPanMotionController::setPosition(float motor0_pos, float motor0_t
     data[14] = (pos2 >> 24) & 0xFF;
     data[15] = time2 & 0xFF;
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
@@ -380,7 +380,7 @@ inline int DaslPanMotionController::scan(int scan_start, int scan_end, float sca
     }
     data[15] = ((int)(goto_time * 10)) & 0xFF;
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
@@ -400,7 +400,7 @@ inline int DaslPanMotionController::serveOff()
     data[2] = BOARD_NO;
     data[3] = 0x0F; // Control off
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
@@ -471,7 +471,7 @@ inline  int DaslPanMotionController::reqScanPos(int start)
 
     data[6] = start & 0x01;
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
@@ -491,7 +491,7 @@ inline int DaslPanMotionController::stop()
     data[2] = BOARD_NO;
     data[3] = 0x28; // stop motor
 
-    if ((ret = execCommand(data)) != 1)
+    if ((ret = execCommandAndWaitUntilResponse(data)) != 1)
     {
         return ret;
     }
@@ -533,7 +533,7 @@ inline int DaslPanMotionController::execCommand(unsigned char *data)
         m_conn_flag = 0;
         return -2;
     }
-    waitReturnValue(data);
+
 
 
     return 1;
@@ -547,7 +547,7 @@ inline int DaslPanMotionController::execCommandAndWaitUntilResponse(unsigned cha
         m_conn_flag = 0;
         return -2;
     }
-
+    waitReturnValue(data);
 
     return 1;
 }
