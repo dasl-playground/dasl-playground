@@ -319,7 +319,7 @@ inline int DaslPanMotionController::setPosition(float motor0_pos, float motor0_t
 inline int DaslPanMotionController::scan(int scan_start, int scan_end, float scan_time, float goto_time, int motor0_pos, int motor1_pos)
 {
     int ret;
-
+    printf("[Trace] Called DaslPanMotionController::scan\n");
     if (m_conn_flag == 0)
         return -1;
 
@@ -376,6 +376,7 @@ inline int DaslPanMotionController::scan(int scan_start, int scan_end, float sca
     {
         return ret;
     }
+    printf("[Trace] Finished DaslPanMotionController::scan\n");
 
     return 0;
 }

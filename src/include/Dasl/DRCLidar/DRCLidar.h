@@ -62,7 +62,9 @@ class DRCLidar {
             mMotion->findHome();
         }
         bool scan(int scan_start_deg=-50, int scan_end_deg=50, float scanning_period=3, float goto_time=1,int finished_pos=0){
+            printf("[Trace] Called DRCLidar::scan\n");
             mMotion->scan(scan_start_deg,scan_end_deg,scanning_period,goto_time,finished_pos,0);
+
         }
         float getPosition(){
             return mMotion->getPosition();

@@ -73,11 +73,12 @@ void DRCVisionActionServer::execute(
     }
     else if(command == "reset"){
         mLidar->reset();
-        mLidar->reset();
     }
     else if(command == "scan"){
-        PointCloud2 message;
+        RCLCPP_DEBUG(this->get_logger(),
+                    "start scan");
 
+        PointCloud2 message;
         mLidar->scan(-50,
                      50,
                      3,
@@ -90,6 +91,8 @@ void DRCVisionActionServer::execute(
        // }
         //message = PointCloud2();
        // mPublisher->publish(message);
+        RCLCPP_DEBUG(this->get_logger(),
+                     "end scan");
     }
 
 }
