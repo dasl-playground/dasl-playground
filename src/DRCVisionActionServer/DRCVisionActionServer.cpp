@@ -50,6 +50,7 @@ rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
 void DRCVisionActionServer::execute(
         const std::shared_ptr<GoalHandleLidarAction> &goal_handle) {
 
+    auto result = std::make_shared<DRCLidarAction ::Result>();
 
 
     auto &&command = goal_handle->get_goal()->command;
@@ -92,6 +93,11 @@ void DRCVisionActionServer::execute(
        // mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
                      "end scan");
+    }
+    if (rclcpp::ok()) {
+        result->result = "success";
+        goal_handle->succeed(result);
+        RCLCPP_INFO(this->get_logger(), "Goal Succeeded");
     }
     RCLCPP_INFO(this->get_logger(),
                 "End DRCVisionActionServer::execute(%s)",
