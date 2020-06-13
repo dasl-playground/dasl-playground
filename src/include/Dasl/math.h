@@ -39,7 +39,7 @@ namespace Dasl{
         return mat;
     }
     inline Eigen::Matrix3d & rotz(double angle,Eigen::Matrix3d & mat){
-        mat << cos(angle) -sin(angle), 0,
+        mat << cos(angle), -sin(angle), 0,
                 sin(angle), cos(angle), 0,
                 0, 0, 1;
         return mat;
@@ -47,7 +47,7 @@ namespace Dasl{
     inline Eigen::Matrix3d  rotz(double angle){
 
         Eigen::Matrix3d  mat;
-        mat << cos(angle) -sin(angle), 0,
+        mat << cos(angle), -sin(angle), 0,
                 sin(angle), cos(angle), 0,
                 0, 0, 1;
         return mat;

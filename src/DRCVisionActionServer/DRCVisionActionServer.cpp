@@ -119,10 +119,10 @@ void DRCVisionActionServer::execute(
             for (int j=0; j <rawLineData.size();j++){
                 float posTilt = ( -135.0f + 0.25f * j) * M_PI /180.0f;
 
-                Eigen::Vector3d u;
-                u<< rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset;
+                Eigen::Vector3d u( rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
 
                 Eigen::Vector3d ret;
+             
                 ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
                 pt.x = ret[0];
                 pt.y = ret[1];
