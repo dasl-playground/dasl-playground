@@ -1,3 +1,0 @@
-ros2 action send_goal /DRCLidarAction dasl_interface/action/DRCLidar "{command: scan}"
-
-

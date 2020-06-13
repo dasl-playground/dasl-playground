@@ -24,29 +24,29 @@ using Eigen::Matrix3Xd;
 //0, 0, 1;
 
 namespace Dasl{
-    inline Eigen::Matrix3Xd & roty(double angle,Matrix3Xd & mat){
+    inline Eigen::Matrix3d & roty(double angle,Eigen::Matrix3d & mat){
         mat << cos(angle),0,sin(angle),
                 0, 1, 0,
                 -sin(angle), 0, cos(angle);
         return mat;
     }
-    inline Eigen::Matrix3Xd  roty(double angle){
+    inline Eigen::Matrix3d  roty(double angle){
 
-        auto  mat = Matrix3Xd();
+        Eigen::Matrix3d mat;
         mat << cos(angle),0,sin(angle),
                 0, 1, 0,
                 -sin(angle), 0, cos(angle);
         return mat;
     }
-    inline Eigen::Matrix3Xd & rotz(double angle,Matrix3Xd & mat){
+    inline Eigen::Matrix3d & rotz(double angle,Eigen::Matrix3d & mat){
         mat << cos(angle) -sin(angle), 0,
                 sin(angle), cos(angle), 0,
                 0, 0, 1;
         return mat;
     }
-    inline Eigen::Matrix3Xd  rotz(double angle){
+    inline Eigen::Matrix3d  rotz(double angle){
 
-        auto  mat = Matrix3Xd();
+        Eigen::Matrix3d  mat;
         mat << cos(angle) -sin(angle), 0,
                 sin(angle), cos(angle), 0,
                 0, 0, 1;

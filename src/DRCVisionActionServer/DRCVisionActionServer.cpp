@@ -24,8 +24,6 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
     );
 
     mPublisher = create_publisher<PointCloud>("PointCloud", 1);
-
-
 }
 
 rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
@@ -125,11 +123,11 @@ void DRCVisionActionServer::execute(
                 u<< rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset;
 
                 Eigen::Vector3d ret;
-                ret = Dasl::roty(posPan) *u;//Dasl::roty(posPan) * Dasl::rotz(posTilt) *
-//                pt.x = ret[0];
-//                pt.y = ret[1];
-//                pt.z = ret[2];
-//                message.points.push_back(pt);
+                ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+                pt.x = ret[0];
+                pt.y = ret[1];
+                pt.z = ret[2];
+                message.points.push_back(pt);
             }
 
         }
