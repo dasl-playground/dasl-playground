@@ -126,10 +126,10 @@ void DRCVisionActionServer::execute(
 
                 Eigen::Vector3d ret;
                 ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
-                pt.x = ret[0];
-                pt.y = ret[1];
-                pt.z = ret[2];
-                message.points.push_back(pt);
+//                pt.x = ret[0];
+//                pt.y = ret[1];
+//                pt.z = ret[2];
+//                message.points.push_back(pt);
             }
 
         }
