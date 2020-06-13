@@ -22,6 +22,9 @@ class DRCLidar {
             mLidarTimeStamp = 0;
         }
     public:
+
+        constexpr static int numScanData = 1080;
+        constexpr static double offsetMechanicalZDistance = 0.0445;
         static DRCLidar * getInstance(){
             static DRCLidar obj;
 
@@ -90,6 +93,13 @@ class DRCLidar {
                 return  mMotion->getPosition();
             }
             return 0.0;
+        }
+        bool  getLidarDistance(std::vector<long>& data, long *time_stamp = NULL){
+
+            if(mLidar.is_open()){
+
+                return  mLidar.get_distance(data, time_stamp);
+            }
         }
     };
 }

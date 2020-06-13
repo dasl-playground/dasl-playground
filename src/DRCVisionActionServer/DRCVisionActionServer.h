@@ -18,7 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <dasl_interface/action/drc_lidar.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/msg/point_cloud.hpp>
 #include <Dasl/Dasl>
 #include <Dasl/math.h>
 #include <mutex>
@@ -34,9 +34,9 @@ public:
     using DRCLidarAction = dasl_interface::action::DRCLidar;
     using GoalHandleLidarAction = rclcpp_action::ServerGoalHandle<DRCLidarAction>;
 
-    using PointCloud2 = sensor_msgs::msg::PointCloud2;
+    using PointCloud = sensor_msgs::msg::PointCloud;
     rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
-    rclcpp::Publisher<PointCloud2>::SharedPtr mPublisher;
+    rclcpp::Publisher<PointCloud>::SharedPtr mPublisher;
 
 
     explicit DRCVisionActionServer(

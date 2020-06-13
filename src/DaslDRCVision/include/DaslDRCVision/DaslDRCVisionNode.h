@@ -26,7 +26,7 @@
 #include <rclcpp/node.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/msg/point_cloud.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <Dasl/Dasl>
 #include <urg_cpp/Urg_driver.h>
@@ -38,7 +38,7 @@
 class DaslLidarNode : public rclcpp::Node
 {
   rclcpp::TimerBase::SharedPtr mTimer;
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr mPublisher;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud>::SharedPtr mPublisher;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr mSubscription;
 
   qrk::Urg_driver mLidar;
@@ -61,7 +61,7 @@ public:
       exit(0);
     }
     RCLCPP_INFO(get_logger(), "Success to open devices");
-    mPublisher = create_publisher<sensor_msgs::msg::PointCloud2>("motorpose1", 100);
+    mPublisher = create_publisher<sensor_msgs::msg::PointCloud>("motorpose1", 100);
     mTimer = create_wall_timer(25ms, std::bind(&DaslLidarNode::pub_topic, this));
     addSubscription(); 
   
@@ -103,7 +103,7 @@ private:
 
   void pub_topic()
   {
-    auto message = sensor_msgs::msg::PointCloud2();
+    auto message = sensor_msgs::msg::PointCloud();
 
     if (!mLidar.get_distance(mRawData, &mLidarTimeStamp))
     {

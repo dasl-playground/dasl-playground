@@ -23,7 +23,7 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
             std::bind(&DRCVisionActionServer::handle_accepted, this, _1)
     );
 
-    mPublisher = create_publisher<PointCloud2>("PointCloud2", 1);
+    mPublisher = create_publisher<PointCloud>("PointCloud", 1);
 
 
 }
@@ -81,30 +81,59 @@ void DRCVisionActionServer::execute(
         RCLCPP_INFO(this->get_logger(),
                     "start scan");
 
-        PointCloud2 message;
+        PointCloud message;
+
         mLidar->scan(-50,
                      50,
                      3,
                      1);
         float posScanEnd = 50;
-        float threshold = 10;
+        float threshold = 1;            //Practically earned threshold
+
+
+        std::vector<float> panAngles;
+        std::vector<std::vector<long>> rawLidarData;
+
         while(1){
             float posPan = mLidar->getPosition();
+            std::vector<long> rawData;
             if(fabs(posPan - posScanEnd) <= threshold ){
                 break;
             }
 
+            panAngles.push_back(posPan);
+            mLidar->getLidarDistance(rawData, NULL);
+            rawLidarData.push_back(rawData);
+
             std::ostringstream ss;
             ss << posPan;
             status = ss.str();
-
             goal_handle->publish_feedback(feedback);
         }
 
+        message.header.stamp = rclcpp::Clock().now();
+        message.header.frame_id = "Dasl_DRCLidar_frame";
+        geometry_msgs::msg::Point32 pt;
 
+        for (int i=0; i < panAngles.size(); i++){
+            float posPan = panAngles[i] * M_PI / 180.0f;
+            auto && rawLineData = rawLidarData[i];
+            for (int j=0; j <rawLineData.size();j++){
+                float posTilt = ( -135.0f + 0.25 * j) * M_PI /180.0f;
 
-        //message = PointCloud2();
-       // mPublisher->publish(message);
+                Eigen::Vector3d u(rawLineData[j]*0.001, 0, Dasl::DRCLidar::offsetMechanicalZDistance);
+                Eigen::Vector3d ret;
+                ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
+                pt.x = ret[0];
+                pt.y = ret[1];
+                pt.z = ret[2];
+                message.points.push_back(pt);
+
+            }
+
+        }
+
+        mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
                      "end scan");
     }
