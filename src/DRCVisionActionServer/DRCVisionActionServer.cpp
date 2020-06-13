@@ -111,14 +111,14 @@ void DRCVisionActionServer::execute(
             goal_handle->publish_feedback(feedback);
         }
 
-      /*  message.header.stamp = rclcpp::Clock().now();
+        message.header.stamp = rclcpp::Clock().now();
         message.header.frame_id = "Dasl_DRCLidar_frame";
         geometry_msgs::msg::Point32 pt;
 
         for (int i=0; i < panAngles.size(); i++){
             float posPan = panAngles[i] * M_PI / 180.0f;
             auto && rawLineData = rawLidarData[i];
-            for (int j=0; j <rawLineData.size();j++){
+          /*  for (int j=0; j <rawLineData.size();j++){
                 float posTilt = ( -135.0f + 0.25 * j) * M_PI /180.0f;
 
                 Eigen::Vector3d u(rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
@@ -128,10 +128,9 @@ void DRCVisionActionServer::execute(
                 pt.y = ret[1];
                 pt.z = ret[2];
                 message.points.push_back(pt);
+            }*/
 
-            }
-
-        }*/
+        }
 
         mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
