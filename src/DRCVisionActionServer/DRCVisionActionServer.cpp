@@ -88,9 +88,9 @@ void DRCVisionActionServer::execute(
 
         PointCloud message;
 
-        mLidar->scan(-50,
+        mLidar->scan(-10,
                      50,
-                     3,
+                     7,
                      1);
         float posScanEnd = 50;
         float threshold = 1;            //Practically earned threshold
@@ -99,22 +99,25 @@ void DRCVisionActionServer::execute(
         std::vector<float> panAngles;
         std::vector<std::vector<long>> rawLidarData;
         using namespace std::chrono_literals;
-        rclcpp::WallRate loop_rate(25ms);
+        rclcpp::WallRate loop_rate(10ms);
         while(1){
-            float posPan = mLidar->getPosition();
             std::vector<long> rawData;
+            mLidar->getLidarDistance(rawData, NULL);
+            rawLidarData.push_back(rawData);
+
+            float posPan = mLidar->getPosition();
+            panAngles.push_back(posPan);
+
+            
             if(fabs(posPan - posScanEnd) <= threshold ){
                 break;
             }
 
-            panAngles.push_back(posPan);
-            mLidar->getLidarDistance(rawData, NULL);
-            rawLidarData.push_back(rawData);
-
-            std::ostringstream ss;
-            ss << posPan;
-            status = ss.str();
-            goal_handle->publish_feedback(feedback);
+          
+            // std::ostringstream ss;
+            // ss << posPan;
+            // status = ss.str();
+            // goal_handle->publish_feedback(feedback);
             loop_rate.sleep();
         }
 
@@ -132,8 +135,13 @@ void DRCVisionActionServer::execute(
 
                 Eigen::Vector3d u( rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
 
-             //   Eigen::Vector3d ret;
-             //   ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+               Eigen::Vector3d ret;
+               ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+                // pt.x = ret[0];
+                // pt.y = ret[1];
+                // pt.z = ret[2];
+
+
                 pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
                 pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
                 pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
