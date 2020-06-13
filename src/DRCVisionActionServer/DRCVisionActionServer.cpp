@@ -23,6 +23,13 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
             std::bind(&DRCVisionActionServer::handle_accepted, this, _1)
     );
 
+    Eigen::Vector3d ret;
+    Eigen::Vector3d u;
+    u<< 0.001, 0, Dasl::DRCLidarZOffset;
+    ret = Dasl::roty(60) *u;
+
+
+
     mPublisher = create_publisher<PointCloud>("PointCloud", 1);
 }
 
@@ -91,7 +98,8 @@ void DRCVisionActionServer::execute(
 
         std::vector<float> panAngles;
         std::vector<std::vector<long>> rawLidarData;
-
+        using namespace std::chrono_literals;
+        rclcpp::WallRate loop_rate(25ms);
         while(1){
             float posPan = mLidar->getPosition();
             std::vector<long> rawData;
@@ -107,6 +115,7 @@ void DRCVisionActionServer::execute(
             ss << posPan;
             status = ss.str();
             goal_handle->publish_feedback(feedback);
+            loop_rate.sleep();
         }
 
         message.header.stamp = rclcpp::Clock().now();
@@ -116,17 +125,19 @@ void DRCVisionActionServer::execute(
         for (int i=0; i < panAngles.size(); i++){
             float posPan = panAngles[i] * M_PI / 180.0f;
             auto && rawLineData = rawLidarData[i];
+            float sp = sin( posPan);
+            float cp = cos( posPan);
             for (int j=0; j <rawLineData.size();j++){
                 float posTilt = ( -135.0f + 0.25f * j) * M_PI /180.0f;
 
                 Eigen::Vector3d u;
                 u<< rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset;
 
-                Eigen::Vector3d ret;
-                ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
-                pt.x = ret[0];
-                pt.y = ret[1];
-                pt.z = ret[2];
+             //   Eigen::Vector3d ret;
+             //   ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+                pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
+                pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
+                pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
                 message.points.push_back(pt);
             }
 
