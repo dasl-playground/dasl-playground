@@ -123,13 +123,13 @@ void DRCVisionActionServer::execute(
 
                 Eigen::Vector3d u;
                 u<< rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset;
-                
+
                 Eigen::Vector3d ret;
-                /*ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
+                ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
                 pt.x = ret[0];
                 pt.y = ret[1];
-                pt.z = ret[2];*/
-                //message.points.push_back(pt);
+                pt.z = ret[2];
+                message.points.push_back(pt);
             }
 
         }
