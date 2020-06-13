@@ -7,6 +7,7 @@
 #include <functional>
 
 
+
 DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options) :
         Node("DRCVisionActionServer", options) {
 
@@ -57,6 +58,9 @@ void DRCVisionActionServer::execute(
     auto &&status = feedback->status;
     auto &&param = goal_handle->get_goal()->parameters;
 
+
+//    auto && matz = Dasl::rotz(10);
+
     RCLCPP_INFO(this->get_logger(),
                 "Begin DRCVisionActionServer::execute(%s)",
                 command.c_str());
@@ -82,18 +86,28 @@ void DRCVisionActionServer::execute(
                      50,
                      3,
                      1);
-                     //0);
-
-
-       // while(1){
+        float posScanEnd = 50;
+        float threshold = 10;
+        while(1){
             float posPan = mLidar->getPosition();
-       // }
+            if(fabs(posPan - posScanEnd) <= threshold ){
+                break;
+            }
+
+            std::ostringstream ss;
+            ss << posPan;
+            status = ss.str();
+
+            goal_handle->publish_feedback(feedback);
+        }
+
+
+
         //message = PointCloud2();
        // mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
                      "end scan");
     }
-    goal_handle->publish_feedback(feedback);
 
     if (rclcpp::ok()) {
         result->result = "success";
@@ -111,7 +125,7 @@ void DRCVisionActionServer::handle_accepted(
    mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
                  "handle accepted");
-    
+
     std::thread([&,goal_handle]() {
         execute(goal_handle);
     }).detach();

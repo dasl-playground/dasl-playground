@@ -24,6 +24,7 @@ find_package(rclcpp_action REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(dasl_interface REQUIRED)
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 
 include_directories(
@@ -41,7 +42,7 @@ ament_target_dependencies(drc_vision_action_server
 )
 
 # #Library for LiDar3D
-target_link_libraries(drc_vision_action_server urg_cpp)
+target_link_libraries(drc_vision_action_server urg_cpp Eigen3::Eigen)
 
 install(TARGETS drc_vision_action_server
   DESTINATION ../${DASL_PLAYGROUND}/lib/${DASL_PLAYGROUND}

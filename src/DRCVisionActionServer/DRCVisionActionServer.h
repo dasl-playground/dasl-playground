@@ -20,6 +20,7 @@
 #include <dasl_interface/action/drc_lidar.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <Dasl/Dasl>
+#include <Dasl/math.h>
 #include <mutex>
 
 
