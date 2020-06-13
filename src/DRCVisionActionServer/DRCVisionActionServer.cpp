@@ -111,7 +111,7 @@ void DRCVisionActionServer::execute(
             goal_handle->publish_feedback(feedback);
         }
 
-        message.header.stamp = rclcpp::Clock().now();
+      /*  message.header.stamp = rclcpp::Clock().now();
         message.header.frame_id = "Dasl_DRCLidar_frame";
         geometry_msgs::msg::Point32 pt;
 
@@ -131,7 +131,7 @@ void DRCVisionActionServer::execute(
 
             }
 
-        }
+        }*/
 
         mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
