@@ -118,8 +118,8 @@ void DRCVisionActionServer::execute(
         for (int i=0; i < panAngles.size(); i++){
             float posPan = panAngles[i] * M_PI / 180.0f;
             auto && rawLineData = rawLidarData[i];
-          /*  for (int j=0; j <rawLineData.size();j++){
-                float posTilt = ( -135.0f + 0.25 * j) * M_PI /180.0f;
+            for (int j=0; j <rawLineData.size();j++){
+                float posTilt = ( -135.0f + 0.25f * j) * M_PI /180.0f;
 
                 Eigen::Vector3d u(rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
                 Eigen::Vector3d ret;
@@ -127,8 +127,8 @@ void DRCVisionActionServer::execute(
                 pt.x = ret[0];
                 pt.y = ret[1];
                 pt.z = ret[2];
-                message.points.push_back(pt);
-            }*/
+                //message.points.push_back(pt);
+            }
 
         }
 
