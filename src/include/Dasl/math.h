@@ -40,16 +40,16 @@ namespace Dasl{
     }
     inline Eigen::Matrix3Xd & rotz(double angle,Matrix3Xd & mat){
         mat << cos(angle) -sin(angle), 0,
-                sin(angle), cos(angle), 0;
-        0, 0, 1;;
+                sin(angle), cos(angle), 0,
+                0, 0, 1;
         return mat;
     }
     inline Eigen::Matrix3Xd  rotz(double angle){
 
         auto && mat = Matrix3Xd();
         mat << cos(angle) -sin(angle), 0,
-                sin(angle), cos(angle), 0;
-        0, 0, 1;;
+                sin(angle), cos(angle), 0,
+                0, 0, 1;
         return mat;
     }
 }

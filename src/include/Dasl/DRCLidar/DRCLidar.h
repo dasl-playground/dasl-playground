@@ -10,6 +10,11 @@
 #include "DaslPanMotionController.h"
 
 namespace Dasl{
+
+
+const  double DRCLidarZOffset = 0.0445;
+
+
 class DRCLidar {
 
         qrk::Urg_driver mLidar;
@@ -23,8 +28,7 @@ class DRCLidar {
         }
     public:
 
-        constexpr static int numScanData = 1080;
-        constexpr static double offsetMechanicalZDistance = 0.0445;
+
         static DRCLidar * getInstance(){
             static DRCLidar obj;
 
