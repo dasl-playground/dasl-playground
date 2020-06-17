@@ -72,6 +72,7 @@ class DaslPanMotionController
     void putCheckSum(unsigned char*data);
     int execCommand(unsigned char *data);
     int waitReturnValue(unsigned char *data);
+    void printMotorStatus(int id);
 
     std::vector<char> comm_buffer;
     DaslRS232 m_comm;
@@ -120,7 +121,16 @@ inline  DaslPanMotionController::~DaslPanMotionController()
 {
     m_comm.close();
 }
-
+inline void DaslPanMotionController::printMotorStatus(int id){
+    printf("[Motor Status] id = %d\n",id);
+    printf("CMD = %d\n",motor_stat[id].bits.CMD);
+    printf("CAL = %d\n",motor_stat[id].bits.CAL);
+    printf("SCAN = %d\n",motor_stat[id].bits.SCAN);
+    printf("READY = %d\n",motor_stat[id].bits.READY);
+    printf("TRANS = %d\n",motor_stat[id].bits.TRANS);
+    printf("REST = %d\n",motor_stat[id].bits.REST);
+    printf("SCAN_POS = %d\n",motor_stat[id].bits.SCAN_POS);
+}
 inline float DaslPanMotionController::getPosition(int index)
 {
     int ret = reqPanPos();
@@ -129,7 +139,7 @@ inline float DaslPanMotionController::getPosition(int index)
         return -1;
     }
     readPanPosition();
-    
+    printMotorStatus(index);
     return ((float)m_pos[index]*DPP);
 }
 inline int DaslPanMotionController::getScanPosition(int start)
@@ -574,3 +584,4 @@ inline int DaslPanMotionController::waitReturnValue(unsigned char *data)
 
 
 #endif
+

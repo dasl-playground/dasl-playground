@@ -28,7 +28,7 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
     u<< 0.001, 0, Dasl::DRCLidarZOffset;
     ret = Dasl::roty(60) *u;
 
-
+    mQuitScanThread = false;
 
     mPublisher = create_publisher<PointCloud>("PointCloud", 1);
 }
@@ -52,7 +52,94 @@ rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
 
     return rclcpp_action::CancelResponse::ACCEPT;
 }
+bool DRCVisionActionServer::readScanPosThread(double endPose) {
 
+    if(!mLidar->open()){
+        return false;
+    }
+    if(!mLidar->findHome()){
+        return false;
+    }
+
+    mQuitScanThread = false;
+
+    std::thread([&](){
+        while(!mQuitScanThread){
+            mCurScanPos = mLidar->getPosition();
+            usleep(1000);
+        }
+
+    }).detach();
+}
+bool DRCVisionActionServer::onScan(){
+
+
+    PointCloud message;
+
+    mLidar->scan(-10,
+                 50,
+                 7,
+                 1);
+    double posScanEnd = 50;
+    double threshold = 1;            //Practically earned threshold
+
+
+    std::vector<double> panAngles;
+    std::vector<std::vector<long>> rawLidarData;
+    using namespace std::chrono_literals;
+    rclcpp::WallRate loop_rate(25ms);
+    while(1){
+        std::vector<long> rawData;
+        mLidar->getLidarDistance(rawData, NULL);
+        rawLidarData.push_back(rawData);
+
+
+        panAngles.push_back(mCurScanPos);
+
+        if(fabs(mCurScanPos - posScanEnd) <= threshold ){
+            mQuitScanThread = true;
+            break;
+        }
+
+
+        // std::ostringstream ss;
+        // ss << posPan;
+        // status = ss.str();
+        // goal_handle->publish_feedback(feedback);
+        loop_rate.sleep();
+    }
+
+    message.header.stamp = rclcpp::Clock().now();
+    message.header.frame_id = "Dasl_DRCLidar_frame";
+    geometry_msgs::msg::Point32 pt;
+
+    for (int i=0; i < panAngles.size(); i++){
+        double posPan = panAngles[i] * M_PI / 180.0;
+        auto && rawLineData = rawLidarData[i];
+        double sp = sin( posPan);
+        double cp = cos( posPan);
+        for (int j=0; j <rawLineData.size();j++){
+            double posTilt = ( -135.0 + 0.25 * j) * M_PI /180.0;
+
+            Eigen::Vector3d u( rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
+
+            Eigen::Vector3d ret;
+            ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+            pt.x = ret[0];
+            pt.y = ret[1];
+            pt.z = ret[2];
+
+
+            // pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
+            // pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
+            // pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
+            message.points.push_back(pt);
+        }
+
+    }
+
+    mPublisher->publish(message);
+}
 void DRCVisionActionServer::execute(
         const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
 
@@ -86,71 +173,9 @@ void DRCVisionActionServer::execute(
         RCLCPP_INFO(this->get_logger(),
                     "start scan");
 
-        PointCloud message;
-
-        mLidar->scan(-10,
-                     50,
-                     7,
-                     1);
-        double posScanEnd = 50;
-        double threshold = 1;            //Practically earned threshold
-
-
-        std::vector<double> panAngles;
-        std::vector<std::vector<long>> rawLidarData;
-        using namespace std::chrono_literals;
-        rclcpp::WallRate loop_rate(10ms);
-        while(1){
-            std::vector<long> rawData;
-            mLidar->getLidarDistance(rawData, NULL);
-            rawLidarData.push_back(rawData);
-
-            double posPan = mLidar->getPosition();
-            panAngles.push_back(posPan);
-
-            
-            if(fabs(posPan - posScanEnd) <= threshold ){
-                break;
-            }
-
-          
-            // std::ostringstream ss;
-            // ss << posPan;
-            // status = ss.str();
-            // goal_handle->publish_feedback(feedback);
-            loop_rate.sleep();
+        if(!onScan()){
+            result->result = "failed";
         }
-
-        message.header.stamp = rclcpp::Clock().now();
-        message.header.frame_id = "Dasl_DRCLidar_frame";
-        geometry_msgs::msg::Point32 pt;
-
-        for (int i=0; i < panAngles.size(); i++){
-            double posPan = panAngles[i] * M_PI / 180.0;
-            auto && rawLineData = rawLidarData[i];
-            double sp = sin( posPan);
-            double cp = cos( posPan);
-            for (int j=0; j <rawLineData.size();j++){
-                double posTilt = ( -135.0 + 0.25 * j) * M_PI /180.0;
-
-                Eigen::Vector3d u( rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
-
-               Eigen::Vector3d ret;
-               ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
-                pt.x = ret[0];
-                pt.y = ret[1];
-                pt.z = ret[2];
-
-
-                // pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
-                // pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
-                // pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
-                message.points.push_back(pt);
-            }
-
-        }
-
-        mPublisher->publish(message);
         RCLCPP_INFO(this->get_logger(),
                      "end scan");
     }

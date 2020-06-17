@@ -28,6 +28,8 @@ class DRCVisionActionServer :public rclcpp::Node{
 
      Dasl::DRCLidar *mLidar = Dasl::DRCLidar::getInstance();
     std::mutex mExecMutex;
+    double mCurScanPos;
+    bool mQuitScanThread;
 
 public:
 
@@ -57,6 +59,9 @@ public:
     void execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
 
+    bool onScan();
+
+    bool readScanPosThread(double endPose);
 };
 
 

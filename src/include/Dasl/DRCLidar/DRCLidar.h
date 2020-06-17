@@ -39,7 +39,12 @@ class DRCLidar {
             close();
         }
 
-
+        bool isOpen(){
+            if (mLidar.is_open() && mMotion->isOpen()){
+                return true;
+            }
+            return false;
+        }
         bool open(std::string ip_address = "10.19.3.10"){
 
             if (mLidar.is_open() && mMotion->isOpen()){
@@ -77,10 +82,12 @@ class DRCLidar {
         }
         bool findHome(){
 
+            //TODO: chk did find home....
             if(mMotion->isOpen()){
                 mMotion->findHome();
                 return true;
             }
+
             return false;
 
         }
