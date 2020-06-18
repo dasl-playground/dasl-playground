@@ -75,6 +75,7 @@ bool DRCVisionActionServer::readScanPosThread(double endPose) {
 bool DRCVisionActionServer::onScan(){
 
 
+    mLidar->open();
     PointCloud message;
     double posScanEnd = 45;
     double threshold = 1;            //Practically earned threshold
@@ -100,27 +101,27 @@ bool DRCVisionActionServer::onScan(){
         panAngles.push_back(mCurScanPos);
 
         if(fabs(mCurScanPos - posScanEnd) <= threshold ){
-            mQuitScanThread = true;
+         
             break;
         }
 
-
+        printf("%f\n",mCurScanPos);
         // std::ostringstream ss;
         // ss << posPan;
         // status = ss.str();
         // goal_handle->publish_feedback(feedback);
         loop_rate.sleep();
     }
+     mLidar->close();
 
     message.header.stamp = rclcpp::Clock().now();
-    message.header.frame_id = "Dasl_DRCLidar_frame";
+    message.header.frame_id = "map";
     geometry_msgs::msg::Point32 pt;
 
     for (int i=0; i < panAngles.size(); i++){
         double posPan = panAngles[i] * M_PI / 180.0;
         auto && rawLineData = rawLidarData[i];
-        double sp = sin( posPan);
-        double cp = cos( posPan);
+
         for (int j=0; j <rawLineData.size();j++){
             double posTilt = ( -135.0 + 0.25 * j) * M_PI /180.0;
 

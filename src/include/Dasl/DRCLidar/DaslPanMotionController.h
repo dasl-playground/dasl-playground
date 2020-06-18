@@ -139,7 +139,7 @@ inline float DaslPanMotionController::getPosition(int index)
         return -1;
     }
     readPanPosition();
-    printMotorStatus(index);
+  //  printMotorStatus(index);
     return ((float)m_pos[index]*DPP);
 }
 inline int DaslPanMotionController::getScanPosition(int start)
