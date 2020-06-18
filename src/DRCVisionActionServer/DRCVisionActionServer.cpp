@@ -57,16 +57,17 @@ bool DRCVisionActionServer::readScanPosThread(double endPose) {
     if(!mLidar->open()){
         return false;
     }
-    if(!mLidar->findHome()){
-        return false;
-    }
+   // if(!mLidar->findHome()){
+   //     return false;
+   // }
 
     mQuitScanThread = false;
+    mCurScanPos = mLidar->getPosition();
 
     std::thread([&](){
         while(!mQuitScanThread){
             mCurScanPos = mLidar->getPosition();
-            usleep(1000);
+            usleep(25000);
         }
 
     }).detach();
@@ -75,25 +76,27 @@ bool DRCVisionActionServer::onScan(){
 
 
     PointCloud message;
-
-    mLidar->scan(-10,
-                 50,
+    double posScanEnd = 45;
+    double threshold = 1;            //Practically earned threshold
+    mLidar->scan(-45,
+                 posScanEnd,
                  7,
                  1);
-    double posScanEnd = 50;
-    double threshold = 1;            //Practically earned threshold
+
 
 
     std::vector<double> panAngles;
     std::vector<std::vector<long>> rawLidarData;
     using namespace std::chrono_literals;
     rclcpp::WallRate loop_rate(25ms);
+    //readScanPosThread(posScanEnd);
+    std::vector<long> rawData;
     while(1){
-        std::vector<long> rawData;
+        rawData.clear();
         mLidar->getLidarDistance(rawData, NULL);
         rawLidarData.push_back(rawData);
 
-
+        mCurScanPos = mLidar->getPosition();
         panAngles.push_back(mCurScanPos);
 
         if(fabs(mCurScanPos - posScanEnd) <= threshold ){
