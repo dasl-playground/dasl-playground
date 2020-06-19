@@ -7,7 +7,6 @@
 #include <functional>
 
 
-
 DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options) :
         Node("DRCVisionActionServer", options) {
 
@@ -25,8 +24,8 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
 
     Eigen::Vector3d ret;
     Eigen::Vector3d u;
-    u<< 0.001, 0, Dasl::DRCLidarZOffset;
-    ret = Dasl::roty(60) *u;
+    u << 0.001, 0, Dasl::DRCLidarZOffset;
+    ret = Dasl::roty(60) * u;
 
     mQuitScanThread = false;
 
@@ -52,27 +51,29 @@ rclcpp_action::CancelResponse DRCVisionActionServer::handle_cancel(
 
     return rclcpp_action::CancelResponse::ACCEPT;
 }
+
 bool DRCVisionActionServer::readScanPosThread(double endPose) {
 
-    if(!mLidar->open()){
+    if (!mLidar->open()) {
         return false;
     }
-   // if(!mLidar->findHome()){
-   //     return false;
-   // }
+    // if(!mLidar->findHome()){
+    //     return false;
+    // }
 
     mQuitScanThread = false;
     mCurScanPos = mLidar->getPosition();
 
-    std::thread([&](){
-        while(!mQuitScanThread){
+    std::thread([&]() {
+        while (!mQuitScanThread) {
             mCurScanPos = mLidar->getPosition();
             usleep(25000);
         }
 
     }).detach();
 }
-bool DRCVisionActionServer::onScan(){
+
+bool DRCVisionActionServer::onScan() {
 
 
     mLidar->open();
@@ -85,69 +86,88 @@ bool DRCVisionActionServer::onScan(){
                  1);
 
 
-
     std::vector<double> panAngles;
+    std::vector<long> rawData;
     std::vector<std::vector<long>> rawLidarData;
+    std::vector<unsigned short> rawIntensity;
+    std::vector<std::vector<unsigned short>> rawIntensityData;
+
     using namespace std::chrono_literals;
     rclcpp::WallRate loop_rate(25ms);
+
     //readScanPosThread(posScanEnd);
-    std::vector<long> rawData;
-    while(1){
+    mLidar->startMeasurementDistanceIntensity();
+
+    while (1) {
         rawData.clear();
-        mLidar->getLidarDistance(rawData, NULL);
+        mLidar->getLidarDistanceIntensity(rawData, rawIntensity,NULL);
         rawLidarData.push_back(rawData);
+        rawIntensityData.push_back(rawIntensity);
 
         mCurScanPos = mLidar->getPosition();
         panAngles.push_back(mCurScanPos);
 
-        if(fabs(mCurScanPos - posScanEnd) <= threshold ){
-         
+        if (fabs(mCurScanPos - posScanEnd) <= threshold) {
+
             break;
         }
 
-        printf("%f\n",mCurScanPos);
+        std::cout << "Distance" << rawData[0] <<" Intensity" << rawIntensity[0] << std::endl;
+
+        //printf("%f\n",mCurScanPos);
         // std::ostringstream ss;
         // ss << posPan;
         // status = ss.str();
         // goal_handle->publish_feedback(feedback);
         loop_rate.sleep();
     }
-     mLidar->close();
+    mLidar->stopMeasurement();
+    mLidar->close();
 
     message.header.stamp = rclcpp::Clock().now();
     message.header.frame_id = "map";
     geometry_msgs::msg::Point32 pt;
 
-    for (int i=0; i < panAngles.size(); i++){
+    sensor_msgs::msg::ChannelFloat32 pclChannel;
+    pclChannel.name = "intensities";
+
+    auto filterIntensityMin = 200;
+    auto filterIntensityMax = 5000;
+
+    for (int i = 0; i < panAngles.size(); i++) {
         double posPan = panAngles[i] * M_PI / 180.0;
-        auto && rawLineData = rawLidarData[i];
+        auto &&rawLineData = rawLidarData[i];
+        auto &&rawLineIntensity = rawIntensityData[i];
 
-        for (int j=0; j <rawLineData.size();j++){
-            double posTilt = ( -135.0 + 0.25 * j) * M_PI /180.0;
+        for (int j = 0; j < rawLineData.size(); j++) {
+            double posTilt = (-135.0 + 0.25 * j) * M_PI / 180.0;
 
-            Eigen::Vector3d u( rawLineData[j]*0.001, 0, Dasl::DRCLidarZOffset);
+            Eigen::Vector3d u(rawLineData[j] * 0.001, 0, Dasl::DRCLidarZOffset);
 
             Eigen::Vector3d ret;
-            ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) *u;
+            ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
             pt.x = ret[0];
             pt.y = ret[1];
             pt.z = ret[2];
 
-
+            if(rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
+                pclChannel.values.push_back(rawLineIntensity[j]);
+                message.points.push_back(pt);
+            }
             // pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
             // pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
             // pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
-            message.points.push_back(pt);
         }
-
     }
 
+    message.channels.push_back(pclChannel);
     mPublisher->publish(message);
 }
+
 void DRCVisionActionServer::execute(
         const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
 
-    auto result = std::make_shared<DRCLidarAction ::Result>();
+    auto result = std::make_shared<DRCLidarAction::Result>();
 
     auto &&command = goal_handle->get_goal()->command;
     auto &&feedback = std::make_shared<DRCLidarAction::Feedback>();
@@ -161,27 +181,23 @@ void DRCVisionActionServer::execute(
                 "Begin DRCVisionActionServer::execute(%s)",
                 command.c_str());
 
-    if(command == "open"){
+    if (command == "open") {
         mLidar->open();
-    }
-    else if(command =="close"){
+    } else if (command == "close") {
         mLidar->close();
-    }
-    else if(command == "find_home"){
+    } else if (command == "find_home") {
         mLidar->findHome();
-    }
-    else if(command == "reset"){
+    } else if (command == "reset") {
         mLidar->reset();
-    }
-    else if(command == "scan"){
+    } else if (command == "scan") {
         RCLCPP_INFO(this->get_logger(),
                     "start scan");
 
-        if(!onScan()){
+        if (!onScan()) {
             result->result = "failed";
         }
         RCLCPP_INFO(this->get_logger(),
-                     "end scan");
+                    "end scan");
     }
 
     if (rclcpp::ok()) {
@@ -197,11 +213,11 @@ void DRCVisionActionServer::execute(
 
 void DRCVisionActionServer::handle_accepted(
         const std::shared_ptr<GoalHandleLidarAction> goal_handle) {
-   mExecMutex.lock();
+    mExecMutex.lock();
     RCLCPP_INFO(get_logger(),
-                 "handle accepted");
+                "handle accepted");
 
-    std::thread([&,goal_handle]() {
+    std::thread([&, goal_handle]() {
         execute(goal_handle);
     }).detach();
 

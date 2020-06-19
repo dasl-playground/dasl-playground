@@ -9,13 +9,13 @@
 #include <urg_cpp/Urg_driver.h>
 #include "DaslPanMotionController.h"
 
-namespace Dasl{
+namespace Dasl {
 
 
-const  double DRCLidarZOffset = 0.0445;
+    const double DRCLidarZOffset = 0.0445;
 
 
-class DRCLidar {
+    class DRCLidar {
 
         qrk::Urg_driver mLidar;
         DaslPanMotionController *mMotion;
@@ -23,56 +23,59 @@ class DRCLidar {
         std::vector<long> mRawData;
         long mLidarTimeStamp;
 
-        DRCLidar(): mMotion(DaslPanMotionController::getInstance()) {
+        DRCLidar() : mMotion(DaslPanMotionController::getInstance()) {
             mLidarTimeStamp = 0;
         }
+
     public:
 
 
-        static DRCLidar * getInstance(){
+        static DRCLidar *getInstance() {
             static DRCLidar obj;
 
             return &obj;
         }
-        ~DRCLidar(){
+
+        ~DRCLidar() {
             //RCLCPP_INFO(get_logger(), "Release Devices");
             close();
         }
 
-        bool isOpen(){
-            if (mLidar.is_open() && mMotion->isOpen()){
+        bool isOpen() {
+            if (mLidar.is_open() && mMotion->isOpen()) {
                 return true;
             }
             return false;
         }
-        bool open(std::string ip_address = "10.19.3.10"){
 
-            if (mLidar.is_open() && mMotion->isOpen()){
+        bool open(std::string ip_address = "10.19.3.10") {
+
+            if (mLidar.is_open() && mMotion->isOpen()) {
                 return true;
             }
 
-            if(!mMotion->isOpen()){
+            if (!mMotion->isOpen()) {
                 mMotion->disconnect();
                 mMotion->connect();
             }
-            if(!mLidar.is_open()) {
+            if (!mLidar.is_open()) {
                 mLidar.close();
                 if (!mLidar.open(ip_address.c_str(), qrk::Urg_driver::Default_port, qrk::Urg_driver::Ethernet)) {
                     return false;
                 }
-                mLidar.stop_measurement();
-                mLidar.start_measurement();
             }
             return true;
         }
-        bool reset(){
+
+        bool reset() {
 
             mLidar.reboot();
         }
-        bool close(){
+
+        bool close() {
             bool ret = true;
 
-            if(!mMotion->isOpen() || !mLidar.is_open()){
+            if (!mMotion->isOpen() || !mLidar.is_open()) {
                 ret = false;
             }
             mLidar.close();
@@ -80,10 +83,11 @@ class DRCLidar {
 
             return ret;
         }
-        bool findHome(){
+
+        bool findHome() {
 
             //TODO: chk did find home....
-            if(mMotion->isOpen()){
+            if (mMotion->isOpen()) {
                 mMotion->findHome();
                 return true;
             }
@@ -91,27 +95,57 @@ class DRCLidar {
             return false;
 
         }
-        bool scan(int scan_start_deg=-50, int scan_end_deg=50, float scanning_period=3, float goto_time=1,int finished_pos=0){
+
+        bool scan(int scan_start_deg = -50, int scan_end_deg = 50, float scanning_period = 3, float goto_time = 1,
+                  int finished_pos = 0) {
             printf("[Trace] Called DRCLidar::scan\n");
-            if(mMotion->isOpen()){
-                mMotion->scan(scan_start_deg,scan_end_deg,scanning_period,goto_time,finished_pos,0);
+            if (mMotion->isOpen()) {
+                mMotion->scan(scan_start_deg, scan_end_deg, scanning_period, goto_time, finished_pos, 0);
                 return true;
             }
             return false;
         }
-        float getPosition(){
-            if(mMotion->isOpen()) {
-                return  mMotion->getPosition();
+
+        float getPosition() {
+            if (mMotion->isOpen()) {
+                return mMotion->getPosition();
             }
             return 0.0;
         }
-        bool  getLidarDistance(std::vector<long>& data, long *time_stamp = NULL){
 
-            if(mLidar.is_open()){
+        bool getLidarDistance(std::vector<long> &data, long *time_stamp = NULL) {
 
-                return  mLidar.get_distance(data, time_stamp);
+            if (mLidar.is_open()) {
+
+                return mLidar.get_distance(data, time_stamp);
             }
         }
+
+        bool getLidarDistanceIntensity(std::vector<long>& data,
+                                       std::vector<unsigned short>& intensity,
+                                       long *time_stamp = NULL){
+            if(mLidar.is_open()){
+                return mLidar.get_distance_intensity(data, intensity, time_stamp);
+            }
+        }
+        bool startMeasurementDistance() {
+            if (mLidar.is_open()) {
+                return mLidar.start_measurement(mLidar.Distance, mLidar.Infinity_times, 0);
+            }
+        }
+
+        bool startMeasurementDistanceIntensity() {
+            if (mLidar.is_open()) {
+                return mLidar.start_measurement(mLidar.Distance_intensity, mLidar.Infinity_times, 0);
+            }
+        }
+
+        void stopMeasurement(){
+            if(mLidar.is_open()){
+                return mLidar.stop_measurement();
+            }
+        }
+
     };
 }
 
