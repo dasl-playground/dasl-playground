@@ -22,14 +22,11 @@ DRCVisionActionServer::DRCVisionActionServer(const rclcpp::NodeOptions &options)
             std::bind(&DRCVisionActionServer::handle_accepted, this, _1)
     );
 
-    Eigen::Vector3d ret;
-    Eigen::Vector3d u;
-    u << 0.001, 0, Dasl::DRCLidarZOffset;
-    ret = Dasl::roty(60) * u;
-
     mQuitScanThread = false;
 
     mPublisher = create_publisher<PointCloud>("PointCloud", 1);
+    mPublisher2 = create_publisher<PointCloud2>("PointCloud2", 1);
+
 }
 
 rclcpp_action::GoalResponse DRCVisionActionServer::handle_goal(
@@ -73,11 +70,11 @@ bool DRCVisionActionServer::readScanPosThread(double endPose) {
     }).detach();
 }
 
-bool DRCVisionActionServer::onScan() {
-
+bool DRCVisionActionServer::onScan1() {
 
     mLidar->open();
     PointCloud message;
+
     double posScanEnd = 45;
     double threshold = 1;            //Practically earned threshold
     mLidar->scan(-45,
@@ -100,7 +97,7 @@ bool DRCVisionActionServer::onScan() {
 
     while (1) {
         rawData.clear();
-        mLidar->getLidarDistanceIntensity(rawData, rawIntensity,NULL);
+        mLidar->getLidarDistanceIntensity(rawData, rawIntensity, NULL);
         rawLidarData.push_back(rawData);
         rawIntensityData.push_back(rawIntensity);
 
@@ -112,7 +109,7 @@ bool DRCVisionActionServer::onScan() {
             break;
         }
 
-        std::cout << "Distance" << rawData[0] <<" Intensity" << rawIntensity[0] << std::endl;
+        std::cout << "Distance" << rawData[0] << " Intensity" << rawIntensity[0] << std::endl;
 
         //printf("%f\n",mCurScanPos);
         // std::ostringstream ss;
@@ -131,8 +128,8 @@ bool DRCVisionActionServer::onScan() {
     sensor_msgs::msg::ChannelFloat32 pclChannel;
     pclChannel.name = "intensities";
 
-    auto filterIntensityMin = 200;
-    auto filterIntensityMax = 5000;
+    auto filterIntensityMin = 100;
+    auto filterIntensityMax = 4000;
 
     for (int i = 0; i < panAngles.size(); i++) {
         double posPan = panAngles[i] * M_PI / 180.0;
@@ -143,25 +140,138 @@ bool DRCVisionActionServer::onScan() {
             double posTilt = (-135.0 + 0.25 * j) * M_PI / 180.0;
 
             Eigen::Vector3d u(rawLineData[j] * 0.001, 0, Dasl::DRCLidarZOffset);
-
             Eigen::Vector3d ret;
             ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
             pt.x = ret[0];
             pt.y = ret[1];
             pt.z = ret[2];
 
-            if(rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
+            if (rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
                 pclChannel.values.push_back(rawLineIntensity[j]);
                 message.points.push_back(pt);
             }
-            // pt.x =  cp * (rawLineData[j]*cos(posTilt)) + 0 + sp *  Dasl::DRCLidarZOffset;
-            // pt.y =  0 + rawLineData[j]*sin(posTilt) + 0;
-            // pt.z =   -sp * rawLineData[j]*cos(posTilt) + 0 + cp * Dasl::DRCLidarZOffset;
+        }
+    }
+    message.channels.push_back(pclChannel);
+    mPublisher->publish(message);
+}
+
+bool DRCVisionActionServer::onScan2() {
+
+    mLidar->open();
+    PointCloud2 message2;
+
+    double posScanEnd = 45;
+    double threshold = 1;            //Practically earned threshold
+    mLidar->scan(-45,
+                 posScanEnd,
+                 7,
+                 1);
+
+
+    std::vector<double> panAngles;
+    std::vector<long> rawData;
+    std::vector<std::vector<long>> rawLidarData;
+    std::vector<unsigned short> rawIntensity;
+    std::vector<std::vector<unsigned short>> rawIntensityData;
+
+    using namespace std::chrono_literals;
+    rclcpp::WallRate loop_rate(25ms);
+
+    //readScanPosThread(posScanEnd);
+    mLidar->startMeasurementDistanceIntensity();
+
+    while (1) {
+        rawData.clear();
+        mLidar->getLidarDistanceIntensity(rawData, rawIntensity, NULL);
+        rawLidarData.push_back(rawData);
+        rawIntensityData.push_back(rawIntensity);
+
+        mCurScanPos = mLidar->getPosition();
+        panAngles.push_back(mCurScanPos);
+
+        if (fabs(mCurScanPos - posScanEnd) <= threshold) {
+
+            break;
+        }
+
+        std::cout << "Distance" << rawData[0] << " Intensity" << rawIntensity[0] << std::endl;
+
+        //printf("%f\n",mCurScanPos);
+        // std::ostringstream ss;
+        // ss << posPan;
+        // status = ss.str();
+        // goal_handle->publish_feedback(feedback);
+        loop_rate.sleep();
+    }
+    mLidar->stopMeasurement();
+    mLidar->close();
+
+    message2.header.stamp = rclcpp::Clock().now();
+    message2.header.frame_id = "map";
+    message2.height = 1;
+
+    message2.fields.resize(4); // 3 + channel size (1) = 4
+    message2.fields[0].name = "x"; //point x
+    message2.fields[1].name = "y"; //point y
+    message2.fields[2].name = "z"; //point z
+    message2.fields[3].name = "intensities"; //Channel name
+
+    int offset = 0;
+    for (size_t d = 0; d < message2.fields.size(); ++d, offset += 4) {
+        message2.fields[d].offset = offset;
+        message2.fields[d].count = 1;
+        message2.fields[d].datatype = sensor_msgs::msg::PointField::FLOAT32;
+    }
+
+    message2.point_step = offset;
+    message2.is_bigendian = false;
+    message2.is_dense = false;
+
+    std::vector<float> ptX;
+    std::vector<float> ptY;
+    std::vector<float> ptZ;
+    std::vector<float> ptIntensity;
+
+    auto filterIntensityMin = 100;
+    auto filterIntensityMax = 4000;
+
+    for (int i = 0; i < panAngles.size(); i++) {
+        double posPan = panAngles[i] * M_PI / 180.0;
+        auto &&rawLineData = rawLidarData[i];
+        auto &&rawLineIntensity = rawIntensityData[i];
+
+        for (int j = 0; j < rawLineData.size(); j++) {
+            double posTilt = (-135.0 + 0.25 * j) * M_PI / 180.0;
+
+            Eigen::Vector3d u(rawLineData[j] * 0.001, 0, Dasl::DRCLidarZOffset);
+            Eigen::Vector3d ret;
+            ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
+
+            if (rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
+                ptX.push_back(ret[0]);
+                ptY.push_back(ret[1]);
+                ptZ.push_back(ret[2]);
+                ptIntensity.push_back(rawLineIntensity[j]);
+            }
         }
     }
 
-    message.channels.push_back(pclChannel);
-    mPublisher->publish(message);
+    message2.width = static_cast<uint32_t>(ptX.size());
+    message2.row_step = message2.point_step * message2.width;
+    message2.data.resize(ptX.size() * message2.point_step);
+
+    for (size_t cp = 0; cp < ptX.size(); ++cp) {
+        memcpy(&message2.data[cp * message2.point_step + message2.fields[0].offset], &ptX[cp],
+               sizeof(float));
+        memcpy(&message2.data[cp * message2.point_step + message2.fields[1].offset], &ptY[cp],
+               sizeof(float));
+        memcpy(&message2.data[cp * message2.point_step + message2.fields[2].offset], &ptZ[cp],
+               sizeof(float));
+        memcpy(&message2.data[cp * message2.point_step + message2.fields[3].offset], &ptIntensity[cp],
+               sizeof(float));
+    }
+    mPublisher2->publish(message2);
 }
 
 void DRCVisionActionServer::execute(
@@ -173,9 +283,6 @@ void DRCVisionActionServer::execute(
     auto &&feedback = std::make_shared<DRCLidarAction::Feedback>();
     auto &&status = feedback->status;
     auto &&param = goal_handle->get_goal()->parameters;
-
-
-//    auto && matz = Dasl::rotz(10);
 
     RCLCPP_INFO(this->get_logger(),
                 "Begin DRCVisionActionServer::execute(%s)",
@@ -189,15 +296,24 @@ void DRCVisionActionServer::execute(
         mLidar->findHome();
     } else if (command == "reset") {
         mLidar->reset();
-    } else if (command == "scan") {
+    } else if (command == "scan1") {
         RCLCPP_INFO(this->get_logger(),
-                    "start scan");
+                    "start scan with PointCloud1");
 
-        if (!onScan()) {
+        if (!onScan1()) {
             result->result = "failed";
         }
         RCLCPP_INFO(this->get_logger(),
-                    "end scan");
+                    "end scan with PointCloud1");
+    } else if (command == "scan2") {
+        RCLCPP_INFO(this->get_logger(),
+                    "start scan with PointCloud2");
+
+        if (!onScan2()) {
+            result->result = "failed";
+        }
+        RCLCPP_INFO(this->get_logger(),
+                    "end scan with PointCloud2");
     }
 
     if (rclcpp::ok()) {

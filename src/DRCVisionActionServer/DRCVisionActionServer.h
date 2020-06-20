@@ -19,6 +19,7 @@
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <dasl_interface/action/drc_lidar.hpp>
 #include <sensor_msgs/msg/point_cloud.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <Dasl/Dasl>
 #include <Dasl/math.h>
 #include <mutex>
@@ -37,8 +38,11 @@ public:
     using GoalHandleLidarAction = rclcpp_action::ServerGoalHandle<DRCLidarAction>;
 
     using PointCloud = sensor_msgs::msg::PointCloud;
+    using PointCloud2 = sensor_msgs::msg::PointCloud2;
+
     rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
     rclcpp::Publisher<PointCloud>::SharedPtr mPublisher;
+    rclcpp::Publisher<PointCloud2>::SharedPtr mPublisher2;
 
 
     explicit DRCVisionActionServer(
@@ -58,10 +62,11 @@ public:
 
     void execute(const std::shared_ptr<GoalHandleLidarAction> goal_handle);
 
-
-    bool onScan();
-
     bool readScanPosThread(double endPose);
+
+    bool onScan1();
+
+    bool onScan2();
 };
 
 
