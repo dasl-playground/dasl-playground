@@ -47,6 +47,8 @@ target_link_libraries(drc_vision_action_server urg_cpp Eigen3::Eigen)
 install(TARGETS drc_vision_action_server
   DESTINATION ../${DASL_PLAYGROUND}/lib/${DASL_PLAYGROUND}
 )
+install(DIRECTORY launch
+        DESTINATION ../${DASL_PLAYGROUND}/share/${DASL_PLAYGROUND})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

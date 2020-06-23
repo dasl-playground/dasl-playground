@@ -24,6 +24,8 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(
         ${PROJECT_NAME} "action/DRCLidar.action"
+        "srv/SaveBinaryFile.srv"
+        "srv/GetBinaryFile.srv"
 )
 
 if(BUILD_TESTING)

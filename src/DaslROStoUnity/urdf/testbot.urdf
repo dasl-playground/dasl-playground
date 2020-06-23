@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<robot name="test_robot">
+
+  <link name="link1">
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.1 0.1 0.5"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+
+    </link>
+
+
+
+
+</robot>
