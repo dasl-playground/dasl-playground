@@ -75,11 +75,11 @@ bool DRCVisionActionServer::onScan1() {
     mLidar->open();
     PointCloud message;
 
-    double posScanEnd = 45;
+    double posScanEnd = 70;
     double threshold = 1;            //Practically earned threshold
-    mLidar->scan(-45,
+    mLidar->scan(-15,
                  posScanEnd,
-                 7,
+                 5,
                  1);
 
 
@@ -109,7 +109,7 @@ bool DRCVisionActionServer::onScan1() {
             break;
         }
 
-        std::cout << "Distance" << rawData[0] << " Intensity" << rawIntensity[0] << std::endl;
+        // std::cout << "Distance" << rawData[0] << " Intensity" << rawIntensity[0] << std::endl;
 
         //printf("%f\n",mCurScanPos);
         // std::ostringstream ss;
@@ -131,6 +131,13 @@ bool DRCVisionActionServer::onScan1() {
     auto filterIntensityMin = 100;
     auto filterIntensityMax = 4000;
 
+    auto filterXMin = 0.0;
+    auto filterXMax = 8.0;
+    auto filterYMin = -4.0;
+    auto filterYMax = 5.0;
+    auto filterZMin = 0.0;
+    auto filterZMax = 2.5;
+
     for (int i = 0; i < panAngles.size(); i++) {
         double posPan = panAngles[i] * M_PI / 180.0;
         auto &&rawLineData = rawLidarData[i];
@@ -138,20 +145,26 @@ bool DRCVisionActionServer::onScan1() {
 
         for (int j = 0; j < rawLineData.size(); j++) {
             double posTilt = (-135.0 + 0.25 * j) * M_PI / 180.0;
+            if (posTilt >= -35 && posTilt <= 35) {
+                Eigen::Vector3d u(rawLineData[j] * 0.001, 0, Dasl::DRCLidarZOffset);
+                Eigen::Vector3d ret;
+                ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
+                pt.x = ret[0];
+                pt.y = ret[1];
+                pt.z = ret[2] + 1.32;
+                if (pt.x <= filterXMax && pt.x >= filterXMin &&
+                    pt.y <= filterYMax && pt.y >= filterYMin &&
+                    pt.z <= filterZMax && pt.z >= filterZMin) {
+                    if (rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
+                        pclChannel.values.push_back(rawLineIntensity[j]);
+                        message.points.push_back(pt);
+                    }
+                }
 
-            Eigen::Vector3d u(rawLineData[j] * 0.001, 0, Dasl::DRCLidarZOffset);
-            Eigen::Vector3d ret;
-            ret = Dasl::roty(posPan) * Dasl::rotz(posTilt) * u;
-            pt.x = ret[0];
-            pt.y = ret[1];
-            pt.z = ret[2];
-
-            if (rawLineIntensity[j] >= filterIntensityMin && rawLineIntensity[j] <= filterIntensityMax) {
-                pclChannel.values.push_back(rawLineIntensity[j]);
-                message.points.push_back(pt);
             }
         }
     }
+    printf("%d \n", message.points.size());
     message.channels.push_back(pclChannel);
     mPublisher->publish(message);
 }
