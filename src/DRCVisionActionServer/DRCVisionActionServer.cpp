@@ -167,9 +167,9 @@ bool DRCVisionActionServer::onScan1() {
 
     double posScanEnd = 70;
     double threshold = 1;            //Practically earned threshold
-    mLidar->scan(-50,
+    mLidar->scan(-10,
                  posScanEnd,
-                 40,
+                 3,
                  1);
 
 
@@ -218,15 +218,15 @@ bool DRCVisionActionServer::onScan1() {
     sensor_msgs::msg::ChannelFloat32 pclChannel;
     pclChannel.name = "intensities";
 
-    auto filterIntensityMin = -3000;
-    auto filterIntensityMax = 6000000;
+    auto filterIntensityMin = 0;
+    auto filterIntensityMax = 4000;
 
-    auto filterXMin = -300.0;
-    auto filterXMax = 300.0;
-    auto filterYMin = -300.0;
-    auto filterYMax = 300.0;
-    auto filterZMin = -100.0;
-    auto filterZMax = 100.5;
+    auto filterXMin = 0.0;
+    auto filterXMax = 8.0;
+    auto filterYMin = -2.0;
+    auto filterYMax = 5.0;
+    auto filterZMin = 0.0;
+    auto filterZMax = 2.0;
 
     for (int i = 0; i < panAngles.size(); i++) {
         double posPan = panAngles[i] * M_PI / 180.0;
