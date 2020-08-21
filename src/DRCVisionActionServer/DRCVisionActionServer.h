@@ -20,16 +20,24 @@
 #include <dasl_interface/action/drc_lidar.hpp>
 #include <sensor_msgs/msg/point_cloud.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <Dasl/Dasl>
 #include <Dasl/math.h>
 #include <mutex>
 
 
+double mLidarCart[6];
 class DRCVisionActionServer :public rclcpp::Node{
 
      Dasl::DRCLidar *mLidar = Dasl::DRCLidar::getInstance();
     std::mutex mExecMutex;
     double mCurScanPos;
+    double mLidarCartPosX;
+    double mLidarCartPosY;
+    double mLidarCartPosZ;
+    double mLidarCartPosRoll;
+    double mLidarCartPosPitch;
+    double mLidarCartPosYaw;
     bool mQuitScanThread;
 
 public:
@@ -39,11 +47,12 @@ public:
 
     using PointCloud = sensor_msgs::msg::PointCloud;
     using PointCloud2 = sensor_msgs::msg::PointCloud2;
+    using Point = geometry_msgs::msg::PoseStamped;
 
     rclcpp_action::Server<DRCLidarAction>::SharedPtr mActionServer;
     rclcpp::Publisher<PointCloud>::SharedPtr mPublisher;
     rclcpp::Publisher<PointCloud2>::SharedPtr mPublisher2;
-
+    rclcpp::Subscription<Point>::SharedPtr mSubscriber;
 
     explicit DRCVisionActionServer(
             const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
@@ -67,6 +76,10 @@ public:
     bool onScan1();
 
     bool onScan2();
+
+    bool onSLAM1();
+
+    void lidar_point(const geometry_msgs::msg::PoseStamped::SharedPtr point) const;
 };
 
 

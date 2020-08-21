@@ -52,6 +52,22 @@ namespace Dasl{
                 0, 0, 1;
         return mat;
     }
+
+    inline Eigen::Matrix3d & rotx(double angle,Eigen::Matrix3d & mat){
+        mat << 1, 0, 0,
+                0, cos(angle), -sin(angle),
+                0, sin(angle), cos(angle);
+
+        return mat;
+    }
+    inline Eigen::Matrix3d  rotx(double angle){
+
+        Eigen::Matrix3d  mat;
+        mat << 1, 0, 0,
+                0, cos(angle), -sin(angle),
+                0, sin(angle), cos(angle);
+        return mat;
+    }
 }
 
 
